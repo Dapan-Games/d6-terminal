@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>d6 terminal</title>
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            background-color: #1c1c1c;
+            color: #33ff66;
+            font-family: "Consolas", "Courier New", monospace;
+            font-size: 16px;
+        }
+
+        #terminal {
+            box-sizing: border-box;
+            height: 100%;
+            padding: 12px 16px;
+            overflow-y: auto;
+            cursor: text;
+        }
+
+        .line {
+            white-space: pre-wrap;
+            word-break: break-word;
+            margin: 2px 0;
+        }
+
+        .line.error {
+            color: #ff5555;
+        }
+
+        .line.cmd {
+            color: #e0e0e0;
+        }
+
+        .prompt-line {
+            display: flex;
+            align-items: center;
+        }
+
+        .prompt {
+            margin-right: 8px;
+            white-space: pre;
+        }
+
+        #input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #e0e0e0;
+            font: inherit;
+            caret-color: #33ff66;
+            padding: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="terminal">
+        <div id="output"></div>
+        <div class="prompt-line">
+            <span class="prompt">&gt;</span>
+            <input id="input" type="text" autocomplete="off" spellcheck="false" autofocus>
+        </div>
+    </div>
+    <script>
+        class Inventory {
+            constructor() {
+                this.inventory = {};
+            }
+
+            list() {
+                console.log(this.inventory)
+                if (Object.keys(this.inventory).length == 0) return "Inventário vazio";
+            }
+        }
+
+        class Battle {
+            rolldice(amount) {
+                let count = 0;
+
+                for (let i = 0; i < amount; i++) {
+                    count += Math.floor(Math.random() * 6) + 1;
+                }
+
+                return count;
+            }
+
+            combat(command, context) {
+                return [this.playerAttack(command, context), this.enemyAttack(context)];
+            }
+
+            playerAttack(command, context) {
+                let dice = command.match(/[0-9]*d6/)[0];
+                let amountDice = parseInt(dice.match(/[0-9]*/)[0]);
+                let playerDiceAttack = parseInt(context.combat.player.attack[0]);
+                let playerDiceDefense = parseInt(context.combat.player.defense[0]);
+                let enemyDiceDefense = parseInt(context.combat.enemy.defense[0]);
+
+                if (amountDice > playerDiceAttack + playerDiceDefense) return `Você não tem isso tudo de dados, você tem no maximo ${playerDiceAttack} dados de ataque e ${playerDiceDefense} dados de defesa`;
+
+                if (amountDice > playerDiceAttack) context.combat.diceDefenseRemain = (playerDiceAttack + playerDiceDefense) - amountDice
+                if (amountDice < playerDiceAttack) context.combat.diceAttackRemain = playerDiceAttack - amountDice
+
+                // rolagem dos dados 
+                let playerAttackValue = this.rolldice(amountDice);
+                let enemyDefenseValue = this.rolldice(enemyDiceDefense);
+
+                console.log(`voce escolheu o dado ${dice} ele rolou player ${playerAttackValue}, enemy ${enemyDefenseValue}`);
+
+                if (playerAttackValue >= enemyDefenseValue && context.combat.enemy.hp > 1) {
+                    context.combat.enemy.hp -= 1;
+                    return `[${context.combat.player.name} atacou o ${context.combat.enemy.name} - ${context.combat.enemy.hp} HP!] ${context.chapter.battle.hit[Math.floor(Math.random() * context.chapter.battle.hit.length)]}`;
+                }
+                if (playerAttackValue >= enemyDefenseValue && context.combat.enemy.hp <= 1) {
+                    context.combat.enemy.hp -= 1;
+                    context.chapter.isBattle = false;
+                    return `[${context.combat.player.name} atacou o ${context.combat.enemy.name} - ${context.combat.enemy.hp} HP!] ${context.chapter.battle.win.content}`;
+                }
+                if (playerAttackValue < enemyDefenseValue) return `[${context.combat.player.name} errou o ataque contra ${context.combat.enemy.name} - ${context.combat.enemy.hp} HP!] | ${context.chapter.battle.miss[Math.floor(Math.random() * context.chapter.battle.miss.length)]}`;
+
+            }
+
+            enemyAttack(context) {
+                let playerDiceDefense = parseInt(context.combat.player.defense[0]);
+                let enemyDiceAttack = parseInt(context.combat.enemy.attack[0]);
+
+                // rolagem dos dados 
+                let enemyAttackValue = this.rolldice(enemyDiceAttack);
+                let playerDefenseValue = this.rolldice(context.combat.diceDefenseRemain + context.combat.diceAttackRemain);
+
+                this.restore(context);
+
+                if (enemyAttackValue >= playerDefenseValue && context.combat.player.hp > 1) {
+                    context.combat.player.hp -= 1;
+                    return `[${context.combat.enemy.name} atacou o ${context.combat.player.name} - ${context.combat.player.hp} HP!] ${context.chapter.battle.attack[Math.floor(Math.random() * context.chapter.battle.attack.length)]}`;
+                }
+
+                if (enemyAttackValue >= playerDefenseValue && context.combat.player.hp <= 1) {
+                    context.combat.player.hp -= 1;
+                    context.chapter.isBattle = false;
+                    context.chapter.isFinal = true;
+                    return `[${context.combat.enemy.name} atacou o ${context.combat.player.name} - ${context.combat.player.hp} HP!] Você morreu!! o Jogo acabou!`;
+                }
+
+                if (enemyAttackValue < playerDefenseValue) return `[${context.combat.enemy.name} errou o ataque contra ${context.combat.player.name} - ${context.combat.player.hp} HP!] ${context.chapter.battle.fail[Math.floor(Math.random() * context.chapter.battle.fail.length)]}`;
+            }
+
+            restore(context) {
+
+                // restore dice defense
+                let playerDiceDefense = context.combat.player.defense[0];
+                let playerDiceAttack = 0
+
+                context.combat.diceDefenseRemain = playerDiceDefense
+                context.combat.diceAttackRemain = playerDiceAttack
+            }
+        }
+
+        class Game {
+            constructor() {
+                this.context = {};
+            }
+
+            init() {
+                this.inventory = new Inventory();
+                this.battle = new Battle();
+                this.chapters = [];
+                this.player = {
+                    name: "barbarian joy",
+                    attack: "2d6",
+                    defense: "1d6",
+                    special: "0d6",
+                    debility: "0d6",
+                    hp: 7,
+                }
+                this.commandMapper = [
+                    {
+                        name: "inventory",
+                        keys: ["inventário", "inventario"],
+                        type: "consulta",
+                        func: this.inventory.list.bind(this.inventory),
+                    },
+                    {
+                        name: "battle",
+                        keys: ["atacar", "bater"],
+                        type: "ação",
+                        func: this.battle.combat.bind(this.battle),
+                    }
+                ]
+            }
+
+            startGame(chapters) {
+                this.chapters = chapters;
+                this.context.chapter = chapters[0];
+
+                return this.context.chapter.content;
+            }
+
+            callNextNarrative(nextChapter) {
+
+                let currentChapter = this.chapters.find(f => f.id === nextChapter.next)
+
+                console.log(currentChapter);
+
+                if (!currentChapter) return "Não ficou claro o que deseja fazer, pode tentar me dizer de outra forma?"
+
+                if (this.context.chapter == currentChapter && currentChapter.isFinal) return "Obrigado por jogar d6 Terminal - by Joeverson Santos";
+
+                if (currentChapter.isBattle) return this.combat(currentChapter);
+
+                this.context.chapter = currentChapter;
+
+                return this.context.chapter.content;
+            }
+
+            combat(currentChapter) {
+                if (this.context.combat == null) {
+                    this.context.combat = {
+                        enemy: currentChapter.enemy,
+                        player: this.player,
+                        turn: 0,
+                        diceDefenseRemain: this.player.defense[0],
+                        diceAttackRemain: 0
+                    }
+
+                    this.context.chapter = currentChapter;
+
+                    return this.context.chapter.content;
+                }
+
+                return "o que voce vai fazer? (se for atacar diga quantos dados 1d6, 4d6)"
+            }
+
+            processor(wordCommand) {
+                let words = wordCommand.split(" ");
+
+                let command = this.commandMapper.find(element => element.keys.find(e => words.includes(e)));
+                let nextChapter = this.context.chapter.options.find(element => element.content.split(" ").find(e => words.includes(e)));
+
+                if (this.context.chapter.isBattle && !command) return this.combat(this.context.chapter);
+
+                if (wordCommand == undefined || !command && !nextChapter) return "Não entendi";
+
+                if (command) return command.func(wordCommand, this.context);
+                if (nextChapter) return this.callNextNarrative(nextChapter);
+            }
+        }
+    </script>
+
+    <script src="ogreHunterChapter.js"></script>
+    <script>
+        const terminal = document.getElementById('terminal');
+        const output = document.getElementById('output');
+        const input = document.getElementById('input');
+        const history = [];
+        let historyIndex = 0;
+
+        const game = new Game();
+        game.init();
+
+        function print(text, cls = '') {
+            const div = document.createElement('div');
+            div.className = 'line ' + cls;
+            div.textContent = text;
+            output.appendChild(div);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        // Receba o texto digitado e retorne (ou lance erro com) o resultado a ser impresso.
+        function execute(command) {
+            return game.processor(command)
+        }
+
+        input.addEventListener('keydown', async (e) => {
+            if (e.key === 'Enter') {
+                const command = input.value.trim();
+                input.value = '';
+                print('> ' + command, 'cmd');
+                if (!command) return;
+                history.push(command);
+                historyIndex = history.length;
+                try {
+                    const result = await execute(command);
+                    if (result !== undefined && result !== null) {
+
+                        if (typeof result === "string") print(`> Mestre: ${result}`);
+                        if (Array.isArray(result)) {
+                            const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+                            for (const item of result) {
+                                print(`> Mestre: ${item}`)
+                                await delay(200); // Pausa o loop por 1,5 segundos antes da próxima fruta
+                            }
+                        }
+                    }
+                } catch (err) {
+                    print(err.message || String(err), 'error');
+                }
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (historyIndex > 0) input.value = history[--historyIndex];
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                historyIndex = Math.min(historyIndex + 1, history.length);
+                input.value = history[historyIndex] || '';
+            }
+        });
+
+        terminal.addEventListener('click', () => input.focus());
+
+        print(`> Mestre: ${game.startGame(ogreHunter)}`);
+    </script>
+</body>
+
+</html>
