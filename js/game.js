@@ -2,7 +2,7 @@ const MIN_COMMAND_LENGTH = 10;
 
 const MESSAGES = {
     tooShort: "Poderia elaborar mais seu pedido, o que você quer fazer?",
-    notUnderstood: "Não entendi",
+    notUnderstood: "Não entendi. Se estiver com dúvidas, digite \"ajuda\".",
     unclearChoice: "Não ficou claro o que deseja fazer, pode tentar me dizer de outra forma?",
     thanks: "Obrigado por jogar d6 Terminal - by Joeverson Santos",
     inBattle: "o que voce vai fazer? (se for atacar diga quantos dados 1d6, 4d6)"
@@ -16,6 +16,7 @@ class Game {
     init() {
         this.inventory = new Inventory();
         this.battle = new Battle();
+        this.helper = new Helper();
         this.chapters = [];
 
         this.playerLoad();
@@ -33,6 +34,12 @@ class Game {
                 keys: ["O que você disse mesmo?", "pode repetir a história novamente?", "o que foi que você disse antes?"],
                 type: "consulta",
                 func: () => this.context.chapter.content,
+            },
+            {
+                name: "help",
+                keys: ["não sei o que fazer, me ajuda", "como eu jogo esse jogo?", "tenho uma dúvida, pode me explicar como funciona?", "quais são os comandos que posso usar?", "como funciona a batalha?"],
+                type: "consulta",
+                func: (_, context) => this.helper.explain(context),
             },
             // {
             //     name: "reload game",
@@ -148,6 +155,8 @@ class Game {
     }
 
     async processor(wordCommand) {
+        if (Helper.isQuickHelp(wordCommand)) return this.helper.explain(this.context);
+
         if (wordCommand.length < MIN_COMMAND_LENGTH) return MESSAGES.tooShort;
 
         const command = await this.commandBrain(wordCommand);
