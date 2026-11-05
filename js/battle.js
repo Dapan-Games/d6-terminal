@@ -27,7 +27,13 @@ class Battle {
             return `o que voce vai fazer? Descreva o seu ataque diga quantos dados de ataque irá usar, você tem ${player.attack} de ataque e ${player.defense} de defesa. voce pode usar todos os dados no ataque, mas irá ficar sem dados para defesa ai o hit é certo!`;
         }
 
-        return [this.playerAttack(command, context), this.enemyAttack(context)];
+        // controle de flag para saber se está lutando pela primeira vez
+        if (context.combat.isFirst) context.combat.isFirst = false; 
+
+        return [
+            this.playerAttack(command, context), 
+            this.enemyAttack(context)
+        ];
     }
 
     playerAttack(command, context) {

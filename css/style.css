@@ -48,6 +48,10 @@ body {
     color: #ff5555;
 }
 
+.red {
+    color: #ff5555;
+}
+
 .line.cmd {
     color: #e0e0e0;
 }
@@ -63,9 +67,13 @@ body {
 .line .card {
     background-color: #111111;
     border-radius: 8px;
-    padding: 10px;
+    padding: 15px;
     text-align: justify;
     border: solid rgb(83, 83, 83) 1px;
+    margin-bottom: 10px;
+}
+.options {
+    margin: 100px 100px;
 }
 
 .prompt-line {
@@ -96,4 +104,13 @@ body {
     scrollbar-width: thin;
     scrollbar-color: #111111 #1c1c1c;
     
+}
+#terminal-container {
+    border: solid rgb(83, 83, 83) 1px;
+    border-radius: 8px;
+    padding: 20px;
+    /* height: 100%; */
+}
+#output {
+    margin-bottom: 20px;
 }
