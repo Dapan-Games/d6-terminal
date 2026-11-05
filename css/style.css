@@ -8,11 +8,17 @@ body {
     font-size: 16px;
 }
 
+.container {
+   width: 100%;
+   max-width: 800px;
+   margin: 0 auto;
+}
+
 #terminal {
     box-sizing: border-box;
     height: 100%;
     padding: 12px 16px;
-    overflow-y: auto;
+    /* overflow-y: auto; */
     cursor: text;
 }
 
@@ -81,4 +87,13 @@ body {
     font: inherit;
     caret-color: #33ff66;
     padding: 0;
+}
+
+#history {
+    max-height: 500px;
+    overflow-y: auto;
+
+    scrollbar-width: thin;
+    scrollbar-color: #111111 #1c1c1c;
+    
 }

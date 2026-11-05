@@ -9,15 +9,17 @@
 </head>
 
 <body>
-    <div id="terminal">
-        <div id="header"></div>
-        <div id="output"></div>
-        <div class="prompt-line">
-            <span class="prompt">&gt;</span>
-            <input id="input" type="text" autocomplete="off" spellcheck="false" autofocus>
+    <div class="container">
+        <div id="terminal">
+            <div id="header"></div>
+            <div id="output"></div>
+            <div class="prompt-line">
+                <span class="prompt">&gt;</span>
+                <input id="input" type="text" autocomplete="off" spellcheck="false" autofocus>
+            </div>
+            <br>
+            <div id="history" class="opacity margin-top-20"></div>
         </div>
-        <br>
-        <div id="history" class="opacity margin-top-20"></div>
     </div>
 
     <!-- Ordem importa: classes primeiro, Game depende delas, terminal.js inicia tudo -->
