@@ -132,7 +132,7 @@ class Game {
         const commandScores = [];
 
         for (const element of this.commandMapper) {
-            const match = await this.embedding.processing(wordCommand, element.keys, 0.7);
+            const match = await this.embedding.processing(wordCommand, element.keys);
 
             if (!match) continue;
 
@@ -147,7 +147,7 @@ class Game {
     // Retorna a opção do capítulo atual mais parecida com o texto
     async chapterBrain(wordCommand) {
         const options = this.context.chapter.options;
-        const match = await this.embedding.processing(wordCommand, options.map(option => option.content), 0.5);
+        const match = await this.embedding.processing(wordCommand, options.map(option => option.content), 0.4);
 
         if (!match) return;
 
