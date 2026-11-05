@@ -59,10 +59,10 @@ const ogreHunter = [
                 content: "Quando o último lobo recua, você encontra marcas recentes de uma criatura enorme levando uma carcaça para o norte. Depois de vencer a alcateia, siga o rastro até a fumaça.",
                 next: "4-A"
             },
-            hit: ["O golpe pega em cheio no lobo cincento", "com o poder do ataque o logo é lançado para trás", "Acertou o golpe!!"],
-            attack: ["O lobo olha fixadamente, corre e salta sobre você acertando a mordida em seu braço", "O lobo corre rapido e lhe acerta com uma babeçada", "Ele consegue lhe morder!"],
-            miss: ["O lobo veloz desvia de seu golpe", "com agilidade o lobo salta por você e sua tentantiva de ataque falha"],
-            fail: ["O ataque do lobo foi desviado por sua agilidade", "ao tentar lhe atacar o lobo salta alto demais e passa por cima de você sem lhe causar dano", "na hora que o lobo vai lhe morder, sua arma vai ao encontro dos dentes dele e bloqueia o ataque."]
+            hit: ["O golpe pega em cheio no lobo cinzento, que gane e cambaleia.", "Com a força do ataque, o lobo é lançado para trás e rola entre as samambaias.", "Sua lâmina corta o pelo eriçado do lobo e ele recua mostrando os dentes.", "Acertou o golpe! O lobo uiva de dor e o resto da alcateia hesita."],
+            attack: ["O lobo olha fixamente, corre e salta sobre você, cravando a mordida em seu braço.", "Um lobo rápido lhe acerta com uma cabeçada no flanco e o desequilibra.", "Dois lobos o cercam e um deles rasga sua perna com as garras.", "Ele consegue lhe morder!"],
+            miss: ["O lobo veloz desvia de seu golpe e rosna, rodeando você.", "Com agilidade, o lobo salta para o lado e sua tentativa de ataque corta só o ar.", "Sua lâmina acerta apenas a terra enquanto o lobo recua e prepara o bote."],
+            fail: ["O ataque do lobo foi desviado por sua agilidade.", "Ao tentar lhe atacar, o lobo salta alto demais e passa por cima de você sem causar dano.", "Na hora em que o lobo vai morder, sua arma encontra os dentes dele e bloqueia o ataque.", "Você gira o corpo e as presas do lobo fecham no vazio."]
         }
     },
     {
@@ -79,6 +79,14 @@ const ogreHunter = [
     },
     {
         "id": "4-A",
+        "isBattle": true,
+        "battle": {
+            "win": { "content": "O Ogro da Brumafunda tomba com um estrondo que faz a clareira tremer. A caçada acabou e a recompensa é sua." },
+            "hit": ["Sua arma abre um corte fundo no braço do ogro, que ruge de fúria.", "O golpe atinge o joelho da criatura e ela cambaleia, quase largando a clava.", "Acertou! O ogro recua um passo, ofegando como um fole.", "Você acerta o flanco do ogro e a pele grossa se rasga."],
+            "attack": ["O ogro ergue o tronco e o desce sobre você, e o impacto faz o chão tremer.", "Uma mão enorme o agarra pelo ombro e o arremessa contra uma árvore.", "A clava varre o ar e acerta suas costelas.", "Ele pisoteia o chão, avança e o acerta com uma cotovelada."],
+            "miss": ["O ogro bloqueia seu golpe com o tronco e a lâmina resvala na madeira.", "A criatura recua com surpreendente agilidade e seu ataque falha.", "Seu golpe encontra apenas o ar quando o ogro se abaixa."],
+            "fail": ["A clava do ogro esmaga o chão onde você estava um instante antes.", "Você rola para o lado e o tronco passa zunindo sobre sua cabeça.", "Você ergue a arma e desvia a pancada, e o ogro perde o equilíbrio.", "O ogro tenta agarrá-lo, mas você escapa por entre as pernas dele."]
+        },
         "content": "O rastro termina numa clareira enfumaçada. O ogro está perto de uma fogueira, distraído com a carcaça que trouxe. Ao notar você, ergue o tronco que usa como clava e ruge. É hora de enfrentar o alvo da recompensa.",
         "parent": "3-A",
         "isFinal": true,
@@ -93,6 +101,14 @@ const ogreHunter = [
     },
     {
         "id": "4-B",
+        "isBattle": true,
+        "battle": {
+            "win": { "content": "O Ogro da Brumafunda tomba com um estrondo que faz a clareira tremer. A caçada acabou e a recompensa é sua." },
+            "hit": ["Sua arma abre um corte fundo no braço do ogro, que ruge de fúria.", "O golpe atinge o joelho da criatura e ela cambaleia, quase largando a clava.", "Acertou! O ogro recua um passo, ofegando como um fole.", "Você acerta o flanco do ogro e a pele grossa se rasga."],
+            "attack": ["O ogro ergue o tronco e o desce sobre você, e o impacto faz o chão tremer.", "Uma mão enorme o agarra pelo ombro e o arremessa contra uma árvore.", "A clava varre o ar e acerta suas costelas.", "Ele pisoteia o chão, avança e o acerta com uma cotovelada."],
+            "miss": ["O ogro bloqueia seu golpe com o tronco e a lâmina resvala na madeira.", "A criatura recua com surpreendente agilidade e seu ataque falha.", "Seu golpe encontra apenas o ar quando o ogro se abaixa."],
+            "fail": ["A clava do ogro esmaga o chão onde você estava um instante antes.", "Você rola para o lado e o tronco passa zunindo sobre sua cabeça.", "Você ergue a arma e desvia a pancada, e o ogro perde o equilíbrio.", "O ogro tenta agarrá-lo, mas você escapa por entre as pernas dele."]
+        },
         "content": "Você chega à clareira sem ser visto e encontra o ogro de costas, ocupado junto à fogueira. Ele ouve um galho estalar e se vira, mas você já está em posição para começar o confronto.",
         "parent": "3-B",
         "isFinal": true,
@@ -123,7 +139,18 @@ const ogreHunter = [
     },
     {
         "id": "3-C",
-        "content": "Uma criatura escamosa investe contra você no vau. Após derrotá-la, você nota pegadas enormes na margem oposta, seguindo na direção de uma fumaça escura. Atravesse e siga o rastro do ogro.",
+        "isBattle": true,
+        "battle": {
+            "win": {
+                "content": "Após derrotar a criatura, você nota pegadas enormes na margem oposta, seguindo na direção de uma fumaça escura. Atravesse e siga o rastro do ogro.",
+                "next": "4-C"
+            },
+            "hit": ["Sua arma encontra a fenda entre as escamas e o crocodilo se debate na água.", "O golpe acerta o focinho do crocodilo, que sacode a cabeça e espirra lama.", "Acertou! O crocodilo recua, batendo a cauda na água turva."],
+            "attack": ["O crocodilo emerge da água e fecha as mandíbulas em sua perna.", "A cauda poderosa varre seus pés e você cai na água rasa, ferido.", "Ele se joga sobre você e as escamas ásperas rasgam seu braço."],
+            "miss": ["O crocodilo mergulha e seu golpe acerta apenas a água.", "As escamas escorregadias desviam sua arma sem causar dano.", "A criatura gira o corpo e escapa da sua investida."],
+            "fail": ["As mandíbulas do crocodilo se fecham a centímetros da sua perna.", "Você se afasta a tempo e a cauda passa zunindo sobre sua cabeça.", "Sua arma bloqueia o bote e o crocodilo recua, sibilando."]
+        },
+        "content": "Uma criatura escamosa investe contra você no vau.",
         "parent": "2-B",
         "isFinal": false,
         "enemy": {
@@ -154,6 +181,14 @@ const ogreHunter = [
     },
     {
         "id": "4-C",
+        "isBattle": true,
+        "battle": {
+            "win": { "content": "O Ogro da Brumafunda tomba com um estrondo que faz a clareira tremer. A caçada acabou e a recompensa é sua." },
+            "hit": ["Sua arma abre um corte fundo no braço do ogro, que ruge de fúria.", "O golpe atinge o joelho da criatura e ela cambaleia, quase largando a clava.", "Acertou! O ogro recua um passo, ofegando como um fole.", "Você acerta o flanco do ogro e a pele grossa se rasga."],
+            "attack": ["O ogro ergue o tronco e o desce sobre você, e o impacto faz o chão tremer.", "Uma mão enorme o agarra pelo ombro e o arremessa contra uma árvore.", "A clava varre o ar e acerta suas costelas.", "Ele pisoteia o chão, avança e o acerta com uma cotovelada."],
+            "miss": ["O ogro bloqueia seu golpe com o tronco e a lâmina resvala na madeira.", "A criatura recua com surpreendente agilidade e seu ataque falha.", "Seu golpe encontra apenas o ar quando o ogro se abaixa."],
+            "fail": ["A clava do ogro esmaga o chão onde você estava um instante antes.", "Você rola para o lado e o tronco passa zunindo sobre sua cabeça.", "Você ergue a arma e desvia a pancada, e o ogro perde o equilíbrio.", "O ogro tenta agarrá-lo, mas você escapa por entre as pernas dele."]
+        },
         "content": "As pegadas levam a uma clareira junto ao brejo. O ogro está remexendo um monte de lenha. Quando você se aproxima, ele agarra sua clava e parte para o ataque.",
         "parent": "3-C",
         "isFinal": true,
@@ -168,6 +203,14 @@ const ogreHunter = [
     },
     {
         "id": "4-D",
+        "isBattle": true,
+        "battle": {
+            "win": { "content": "O Ogro da Brumafunda tomba com um estrondo que faz a clareira tremer. A caçada acabou e a recompensa é sua." },
+            "hit": ["Sua arma abre um corte fundo no braço do ogro, que ruge de fúria.", "O golpe atinge o joelho da criatura e ela cambaleia, quase largando a clava.", "Acertou! O ogro recua um passo, ofegando como um fole.", "Você acerta o flanco do ogro e a pele grossa se rasga."],
+            "attack": ["O ogro ergue o tronco e o desce sobre você, e o impacto faz o chão tremer.", "Uma mão enorme o agarra pelo ombro e o arremessa contra uma árvore.", "A clava varre o ar e acerta suas costelas.", "Ele pisoteia o chão, avança e o acerta com uma cotovelada."],
+            "miss": ["O ogro bloqueia seu golpe com o tronco e a lâmina resvala na madeira.", "A criatura recua com surpreendente agilidade e seu ataque falha.", "Seu golpe encontra apenas o ar quando o ogro se abaixa."],
+            "fail": ["A clava do ogro esmaga o chão onde você estava um instante antes.", "Você rola para o lado e o tronco passa zunindo sobre sua cabeça.", "Você ergue a arma e desvia a pancada, e o ogro perde o equilíbrio.", "O ogro tenta agarrá-lo, mas você escapa por entre as pernas dele."]
+        },
         "content": "A passagem pela árvore deixa você perto da clareira sem precisar cruzar o brejo. O ogro está de guarda junto à fogueira e percebe sua chegada. Ele rosna e avança, bloqueando o caminho de volta.",
         "parent": "3-D",
         "isFinal": true,
@@ -198,7 +241,18 @@ const ogreHunter = [
     },
     {
         "id": "3-E",
-        "content": "Um caçador desertor surge entre as árvores. Ele acredita que você veio disputar a recompensa e ataca antes que consiga explicar sua missão. Depois de vencê-lo, você encontra no acampamento dele um mapa que indica a clareira do ogro.",
+        "isBattle": true,
+        "battle": {
+            "win": {
+                "content": "Depois de vencê-lo, você encontra no acampamento dele um mapa que indica a clareira do ogro.",
+                "next": "4-E"
+            },
+            "hit": ["Sua lâmina atravessa a guarda do caçador e ele resmunga de dor.", "O golpe o acerta no ombro e a faca de caça quase lhe escapa da mão.", "Acertou! O desertor tropeça para trás, ofegante."],
+            "attack": ["O caçador gira a faca e corta seu braço antes que você reaja.", "Ele dispara uma flecha à queima-roupa e ela raspa seu ombro.", "Um chute no seu joelho o derruba, e a lâmina dele alcança suas costelas."],
+            "miss": ["O desertor se joga atrás de uma árvore e seu golpe lasca a casca.", "Ele rola pelo chão e sai do alcance da sua arma.", "Com um passo de lado, o caçador evita o ataque."],
+            "fail": ["Você bloqueia a faca dele com a guarda da sua arma.", "A flecha do caçador passa de raspão e se crava no tronco atrás de você.", "Você prevê o golpe e desvia, enquanto ele perde o equilíbrio."]
+        },
+        "content": "Um caçador desertor surge entre as árvores. Ele acredita que você veio disputar a recompensa e ataca antes que consiga explicar sua missão.",
         "parent": "2-C",
         "isFinal": false,
         "enemy": {
@@ -217,7 +271,18 @@ const ogreHunter = [
     },
     {
         "id": "3-F",
-        "content": "Você monta a armadilha com cuidado e deixa um pedaço de carne como isca. Um javali faminto aparece antes do ogro e investe contra você, enfurecido. Depois do confronto, a isca desapareceu e as pegadas enormes seguem em direção à clareira.",
+        "isBattle": true,
+        "battle": {
+            "win": {
+                "content": "Depois do confronto, a isca desapareceu e as pegadas enormes seguem em direção à clareira.",
+                "next": "4-F"
+            },
+            "hit": ["Sua arma atinge o lombo do javali, que guincha e derrapa na terra.", "O golpe pega de lado e o javali rola pelo chão.", "Acertou! O javali sacode a cabeça, atordoado."],
+            "attack": ["O javali investe de cabeça e as presas arranham sua coxa.", "Ele atinge seu abdômen com uma trombada e tira o ar dos seus pulmões.", "O animal gira e acerta você com as presas."],
+            "miss": ["O javali muda de direção no último instante e seu golpe falha.", "Sua arma raspa nas cerdas duras sem ferir o animal.", "O bicho escapa pelo mato e volta rosnando."],
+            "fail": ["Você salta de lado e o javali passa direto, esmagando a vegetação.", "As presas do javali prendem na sua arma, que as desvia.", "A investida do animal erra e ele bate numa raiz, furioso."]
+        },
+        "content": "Você monta a armadilha com cuidado e deixa um pedaço de carne como isca. Um javali faminto aparece antes do ogro e investe contra você, enfurecido.",
         "parent": "2-C",
         "isFinal": false,
         "enemy": {
@@ -236,6 +301,14 @@ const ogreHunter = [
     },
     {
         "id": "4-E",
+        "isBattle": true,
+        "battle": {
+            "win": { "content": "O Ogro da Brumafunda tomba com um estrondo que faz a clareira tremer. A caçada acabou e a recompensa é sua." },
+            "hit": ["Sua arma abre um corte fundo no braço do ogro, que ruge de fúria.", "O golpe atinge o joelho da criatura e ela cambaleia, quase largando a clava.", "Acertou! O ogro recua um passo, ofegando como um fole.", "Você acerta o flanco do ogro e a pele grossa se rasga."],
+            "attack": ["O ogro ergue o tronco e o desce sobre você, e o impacto faz o chão tremer.", "Uma mão enorme o agarra pelo ombro e o arremessa contra uma árvore.", "A clava varre o ar e acerta suas costelas.", "Ele pisoteia o chão, avança e o acerta com uma cotovelada."],
+            "miss": ["O ogro bloqueia seu golpe com o tronco e a lâmina resvala na madeira.", "A criatura recua com surpreendente agilidade e seu ataque falha.", "Seu golpe encontra apenas o ar quando o ogro se abaixa."],
+            "fail": ["A clava do ogro esmaga o chão onde você estava um instante antes.", "Você rola para o lado e o tronco passa zunindo sobre sua cabeça.", "Você ergue a arma e desvia a pancada, e o ogro perde o equilíbrio.", "O ogro tenta agarrá-lo, mas você escapa por entre as pernas dele."]
+        },
         "content": "O mapa leva você diretamente à clareira. O ogro está junto à fogueira e carrega no cinto uma bolsa com objetos roubados. Ao ver você, larga tudo e ergue a clava.",
         "parent": "3-E",
         "isFinal": true,
@@ -250,6 +323,14 @@ const ogreHunter = [
     },
     {
         "id": "4-F",
+        "isBattle": true,
+        "battle": {
+            "win": { "content": "O Ogro da Brumafunda tomba com um estrondo que faz a clareira tremer. A caçada acabou e a recompensa é sua." },
+            "hit": ["Sua arma abre um corte fundo no braço do ogro, que ruge de fúria.", "O golpe atinge o joelho da criatura e ela cambaleia, quase largando a clava.", "Acertou! O ogro recua um passo, ofegando como um fole.", "Você acerta o flanco do ogro e a pele grossa se rasga."],
+            "attack": ["O ogro ergue o tronco e o desce sobre você, e o impacto faz o chão tremer.", "Uma mão enorme o agarra pelo ombro e o arremessa contra uma árvore.", "A clava varre o ar e acerta suas costelas.", "Ele pisoteia o chão, avança e o acerta com uma cotovelada."],
+            "miss": ["O ogro bloqueia seu golpe com o tronco e a lâmina resvala na madeira.", "A criatura recua com surpreendente agilidade e seu ataque falha.", "Seu golpe encontra apenas o ar quando o ogro se abaixa."],
+            "fail": ["A clava do ogro esmaga o chão onde você estava um instante antes.", "Você rola para o lado e o tronco passa zunindo sobre sua cabeça.", "Você ergue a arma e desvia a pancada, e o ogro perde o equilíbrio.", "O ogro tenta agarrá-lo, mas você escapa por entre as pernas dele."]
+        },
         "content": "Você segue o rastro até a clareira. O ogro encontra os restos da isca e fareja o ar até localizar você. Com um grunhido furioso, agarra o tronco que usa como clava e avança.",
         "parent": "3-F",
         "isFinal": true,
