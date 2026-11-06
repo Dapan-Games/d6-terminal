@@ -12,7 +12,8 @@ const CONTEXT_STATE = {
     Chapter: 1,
     Consult: 2,
     Combat: 3,
-    System: 4
+    System: 4,
+    EndGame: 5
 }
 
 class Game {
@@ -20,8 +21,12 @@ class Game {
         this.context = {
             chapter: null,
             combat: null,
+            player: null,
             currentState: CONTEXT_STATE.None,
-            is: (state) => this.context.currentState === state
+            is: (state) => this.context.currentState === state,
+            settings: {
+                isFirstBattle: true,
+            }
         };
     }
 
@@ -36,16 +41,28 @@ class Game {
         // Para adicionar um comando novo: inclua um item aqui com frases-exemplo (keys) e a função (func)
         this.commandMapper = [
             {
-                name: "inventory",
+                name: "ver inventory",
                 keys: ["abrir o inventário", "o que tem no inventario", "olhar a bolsa para ver o que tem", "o que estou usando"],
                 type: CONTEXT_STATE.Consult,
                 func: this.inventory.list.bind(this.inventory),
             },
             {
+                name: "detalhes de equipamento",
+                keys: ["quero detalhes", "me fale mais sobre", "quero ver"],
+                type: CONTEXT_STATE.Consult,
+                func: this.inventory.desctiption.bind(this.inventory),
+            },
+            {
+                name: "equipar equipamento",
+                keys: ["quero equipar a espada", "equipe o escudo", "quero modificar meu equipamento para"],
+                type: CONTEXT_STATE.Consult,
+                func: this.inventory.equip.bind(this.inventory),
+            },
+            {
                 name: "resume story",
                 keys: ["O que você disse mesmo?", "pode repetir a história novamente?", "o que foi que você disse antes?", "pode continuar", "repita novamente"],
                 type: CONTEXT_STATE.Chapter,
-                func: () => this.context.chapter.content,
+                func: (_, context) => this.narrative(context.chapter),
             },
             {
                 name: "help",
@@ -61,7 +78,7 @@ class Game {
             // },
             {
                 name: "battle",
-                keys: ["atacar o inimigo", "bater no bicho", "sacar a arma e ir para o ataque", "vou atacar com 1d6"],
+                keys: ["atacar o inimigo", "sacar a arma e ir para o ataque", "vou atacar com 1d6", "iniciar o ataque"],
                 type: CONTEXT_STATE.Combat,
                 func: this.battle.combat.bind(this.battle),
             }
@@ -72,22 +89,13 @@ class Game {
     }
 
     playerLoad() {
-        let amountAttackDice = this.inventory.inventory.reduce((acc, item) => {
-            if (item.type === "attack") return acc + parseInt(item.dice)
+        let attackDice = this.inventory.inventory.find(f => f.isEquiped && f.type === "attack") || {};
+        let defenseDice = this.inventory.inventory.find(f => f.isEquiped && f.type === "defense") || {};
 
-            return acc;
-        }, 0);
-
-        let amountDefenseDice = this.inventory.inventory.reduce((acc, item) => {
-            if (item.type === "defense") return acc + parseInt(item.dice)
-
-            return acc;
-        }, 0);
-
-        this.player = {
-            name: "barbarian joy",
-            attack: `${amountAttackDice}d6`,
-            defense: `${amountDefenseDice}d6`,
+        this.context.player = {
+            name: "player",
+            attack: attackDice?.dice || "0d6",
+            defense: defenseDice?.dice || "0d6",
             special: "0d6",
             debility: "0d6",
             hp: 7,
@@ -96,7 +104,31 @@ class Game {
 
     startGame(chapters) {
         this.chapters = chapters;
-        const chapter = chapters[2];
+        const chapter = chapters[0];
+
+        // this.context.currentState = CONTEXT_STATE.Consult
+        // return this.commandMapper[0].func(undefined, this.context);
+        return this.narrative(chapter);
+    }
+
+    // --- Narrativa ---
+
+    nextNarrative(option) {
+        const nextChapter = this.chapters.find(chapter => chapter.id === option.next);
+
+        if (!nextChapter) return MESSAGES.unclearChoice;
+
+        return this.narrative(nextChapter);
+    }
+
+    narrative(chapter) {
+        // const chapter = isResume ? this.context.chapter : this.chapters.find(chapter => chapter.id === option.next);
+
+        console.log(chapter);
+
+        if (!chapter) return MESSAGES.unclearChoice;
+
+        if (this.context.chapter == chapter && chapter.isFinal) return MESSAGES.thanks;
 
         if (chapter.isBattle) return this.startCombat(chapter);
 
@@ -106,43 +138,22 @@ class Game {
         return this.context.chapter.content;
     }
 
-    // --- Narrativa ---
-
-    callNextNarrative(option) {
-        const nextChapter = this.chapters.find(chapter => chapter.id === option.next);
-
-        console.log(nextChapter);
-
-        if (!nextChapter) return MESSAGES.unclearChoice;
-
-        if (this.context.chapter == nextChapter && nextChapter.isFinal) return MESSAGES.thanks;
-
-        if (nextChapter.isBattle) return this.startCombat(nextChapter);
-
-        this.context.chapter = nextChapter;
-        this.context.currentState = CONTEXT_STATE.Chapter;
-
-        return this.context.chapter.content;
-    }
-
     startCombat(battleChapter) {
-        if (this.context.combat == null) {
+        if (this.context.combat == null || this.context.combat.isFinishCombat) {
             this.context.combat = {
                 enemy: battleChapter.enemy,
-                player: this.player,
+                player: this.context.player,
                 turn: 0,
-                diceDefenseRemain: parseInt(this.player.defense),
+                diceDefenseRemain: parseInt(this.context.player.defense),
                 diceAttackRemain: 0,
-                isFirst: true
+                isFinishCombat: false
             };
-
-            this.context.chapter = battleChapter;
-            this.context.currentState = CONTEXT_STATE.Combat;
-
-            return this.context.chapter.content;
         }
 
-        return MESSAGES.inBattle;
+        this.context.chapter = battleChapter;
+        this.context.currentState = CONTEXT_STATE.Combat;
+
+        return this.context.chapter.content;
     }
 
     // --- Interpretação do texto digitado ---
@@ -177,6 +188,8 @@ class Game {
     async processor(wordCommand) {
         if (Helper.isQuickHelp(wordCommand)) return this.helper.explain(this.context);
 
+        if (this.context.is(CONTEXT_STATE.EndGame)) return MESSAGES.thanks;
+
         if (wordCommand.length < MIN_COMMAND_LENGTH) return MESSAGES.tooShort;
 
         const command = await this.commandBrain(wordCommand);
@@ -188,10 +201,10 @@ class Game {
 
         if (!command && !nextChapter) return MESSAGES.notUnderstood;
 
-        if (nextChapter) return this.callNextNarrative(nextChapter);
+        if (nextChapter) return this.nextNarrative(nextChapter);
         if (command) {
             this.context.currentState = command.type;
-            return command.func(wordCommand, this.context);
+            return await command.func(wordCommand, this.context);
         }
     }
 }

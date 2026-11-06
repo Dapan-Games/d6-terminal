@@ -66,6 +66,7 @@ class Embedding {
         }
 
         command = this.clearCommand(command);
+        phasesExpected = phasesExpected.map(m => this.clearCommand(m));
 
         const vectors = (await this.extractor([command, ...phasesExpected], { pooling: 'mean', normalize: true })).tolist();
         const commandVector = vectors.shift();

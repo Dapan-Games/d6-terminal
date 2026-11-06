@@ -10,7 +10,7 @@ function randomItem(list) {
 }
 
 class Battle {
-    rolldice(amount) {
+    diceRoll(amount) {
         let total = 0;
 
         for (let i = 0; i < amount; i++) {
@@ -28,12 +28,23 @@ class Battle {
         }
 
         // controle de flag para saber se está lutando pela primeira vez
-        if (context.combat.isFirst) context.combat.isFirst = false; 
+        if (context.settings.isFirstBattle) context.settings.isFirstBattle = false;
 
-        return [
-            this.playerAttack(command, context), 
-            this.enemyAttack(context)
-        ];
+        const playerNarrative = this.playerAttack(command, context);
+        const enemyNarrative = this.enemyAttack(context);
+
+        const isEnemyDie = context.combat.enemy.hp === 0;
+        const healthTag = `<span class="violet">[Você - <strong>${context.combat.player.hp}HP</strong> | ${context.combat.enemy.name} - <strong>${context.combat.enemy.hp}HP</strong>]</span></br>`;
+
+        const message = [];
+
+        if (!isEnemyDie) message.push(healthTag);
+        if (playerNarrative) message.push(...playerNarrative);
+        if (enemyNarrative) message.push("", ...enemyNarrative);
+
+        if (isEnemyDie) this.finishCombat(context);
+
+        return message;
     }
 
     playerAttack(command, context) {
@@ -54,59 +65,81 @@ class Battle {
         if (amountDice > playerDiceAttack) context.combat.diceDefenseRemain = (playerDiceAttack + playerDiceDefense) - amountDice;
         if (amountDice < playerDiceAttack) context.combat.diceAttackRemain = playerDiceAttack - amountDice;
 
-        const playerAttackValue = this.rolldice(amountDice);
-        const enemyDefenseValue = this.rolldice(enemyDiceDefense);
-
-        console.log(`voce escolheu o dado ${dice} ele rolou player ${playerAttackValue}, enemy ${enemyDefenseValue}`);
+        const playerAttackValue = this.diceRoll(amountDice);
+        const enemyDefenseValue = this.diceRoll(enemyDiceDefense);
 
         if (playerAttackValue < enemyDefenseValue) {
-            return `${player.name} errou o ataque contra ${enemy.name}, ${randomItem(battle.miss)}`;
+            return [
+                `Você <span class="red">erra</span> o ataque.`,
+                randomItem(battle.miss)
+            ];
         }
 
-        const isKillingBlow = enemy.hp <= 1;
         enemy.hp -= 1;
-        const status = `${player.name} <span class="green">acertou o ataque</span> em ${enemy.name} (-1HP => ${enemy.hp} HP)`;
 
-        if (isKillingBlow) {
+        const status = `Você <span class="green">acerta</span> o ataque.`;
+
+        if (enemy.hp == 0) {
             context.chapter.isBattle = false;
-            context.combat = null;
-            return `${status} ${battle.win.content}`;
+            context.currentState = CONTEXT_STATE.Chapter
+
+            return [
+                status,
+                battle.win.content
+            ];
         }
 
-        return `${status} ${randomItem(battle.hit)}`;
+        return [
+            status,
+            randomItem(battle.hit)
+        ];
     }
 
     enemyAttack(context) {
+        if (!context.chapter.isBattle) return;
+
         const { player, enemy } = context.combat;
         const { battle } = context.chapter;
 
-        const enemyAttackValue = this.rolldice(diceCount(enemy.attack));
-        const playerDefenseValue = this.rolldice(context.combat.diceDefenseRemain + context.combat.diceAttackRemain);
+        const enemyAttackValue = this.diceRoll(diceCount(enemy.attack));
+        const playerDefenseValue = this.diceRoll(context.combat.diceDefenseRemain + context.combat.diceAttackRemain);
 
         this.restore(context);
 
         if (enemyAttackValue < playerDefenseValue) {
-            return `${enemy.name} errou o ataque contra ${player.name}, ${randomItem(battle.fail)}`;
+            return [
+                `${enemy.name} <span class="red">erra</span> o ataque.`,
+                randomItem(battle.fail)
+            ];
         }
 
-        const isKillingBlow = player.hp <= 1;
         player.hp -= 1;
-        const status = `${enemy.name} <span class="red">acertou o ataque</span> em ${player.name} (-1HP => ${player.hp} HP)`;
+        const status = `${enemy.name} <span class="green">acerta</span> o ataque.`;
 
-        if (isKillingBlow) {
+        if (player.hp == 0) {
             context.chapter.isBattle = false;
             context.chapter.isFinal = true;
-            context.combat = null;
-            return `${status} Você morreu!! o Jogo acabou!`;
+
+            return [
+                status,
+                `<span class="red font-big">Você morreu!! o Jogo acabou!</span>`
+            ];
         }
 
-        return `${status} ${randomItem(battle.attack)}`;
+        return [
+            status,
+            randomItem(battle.attack)
+        ];
     }
 
     // devolve todos os dados de defesa ao jogador para o próximo turno
     restore(context) {
         context.combat.diceDefenseRemain = diceCount(context.combat.player.defense);
         context.combat.diceAttackRemain = 0;
+    }
+
+    finishCombat(context) {
+        context.combat.isFinishCombat = true;
     }
 }
 

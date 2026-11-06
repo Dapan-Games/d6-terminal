@@ -1,7 +1,7 @@
 const masterLine = (text, context) => {
     let actions = '';
 
-    if (context.chapter.options && context.is(CONTEXT_STATE.Chapter)) {
+    if (context.chapter?.options && context.is(CONTEXT_STATE.Chapter)) {
         actions = '<ul>';
         
         context.chapter.options.forEach(f => actions += `<li>${f.content}</li>`);
@@ -11,13 +11,14 @@ const masterLine = (text, context) => {
 
     // badge incombate
         
-    const inCombat = context.is(CONTEXT_STATE.Combat) ? `<span class="red">[EM COMBATE]</span>` : '';
+    const badgeInCombat = context.is(CONTEXT_STATE.Combat) ? `<span class="red">[COMBATE INICIADO]</span>` : '';
 
     return [
-        `<div><p class="yellow">$> Mestre: ${inCombat}</p><div class="card">${text}</div></div>`,
+        `<div><p class="yellow">$> Mestre: ${badgeInCombat}</p><div class="card">${text}</div></div>`,
         context.is(CONTEXT_STATE.Chapter) && `<div><p class="yellow">$> Mestre: o que você quer fazer?</p> ${actions}</div>` || "",
-        context.is(CONTEXT_STATE.Consult) && `<div><p class="yellow">$> Mestre: se quiser continuar a história so me dizer que voltamos.</p></div>` || "",
-        (context.is(CONTEXT_STATE.Combat) && context.combat.isFirst) && `<div><p class="yellow">$> Mestre: </p>Para combater é simples, descreva como é o ataque e informe quantos dados irá usar no ataque.Ex. 1d6, 2d6, pode ver quantos dados você tem no seu inventário.</div>` || "",
+        context.is(CONTEXT_STATE.Consult) && `<div><p class="yellow">$> Mestre: </p> Narrativa em espera, diga 'continuar' para avançarmos no enredo. </div>` || "",
+        (context.is(CONTEXT_STATE.Combat) && context.settings.isFirstBattle) && `<div><p class="yellow">$> Mestre: <span class="blue">[DICA]</span></p>Em combate, a narrativa e a mecânica caminham juntas. Diga-me como seu personagem executa a investida e quantos dados você está lançando — seja <strong class="yellow">1d6</strong>, <strong class="yellow">2d6</strong> ou mais. Confirme sempre no seu inventário o que sua arma tem capacidade de causar.</div>` || "",
+        context.is(CONTEXT_STATE.EndGame) && `<div><p class="yellow">$> Mestre: <span class="blue">[DICA]</span></p>Quer jogar outra aventura? ou tentar algo diferente? recarregue a pagina!.</div>` || "",
     ];
 }
 const ARRAY_LINE_DELAY_MS = 400;
@@ -119,8 +120,9 @@ class Terminal {
     }
 }
 
+const game = new Game();
+
 window.addEventListener('DOMContentLoaded', () => {
-    const game = new Game();
     game.init();
 
     new Terminal(game).start(ogreHunter);
