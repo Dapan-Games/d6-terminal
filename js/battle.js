@@ -22,10 +22,10 @@ class Battle {
 
     // Retorna uma instrução (string) se o jogador não informou dados, senão os dois turnos [jogador, inimigo]
     combat(command, context) {
-        if (!DICE_PATTERN.test(command)) {
-            const { player } = context.combat;
-            return `o que voce vai fazer? Descreva o seu ataque diga quantos dados de ataque irá usar, você tem ${player.attack} de ataque e ${player.defense} de defesa. voce pode usar todos os dados no ataque, mas irá ficar sem dados para defesa ai o hit é certo!`;
-        }
+        // if (!DICE_PATTERN.test(command)) {
+        //     const { player } = context.combat;
+        //     return `o que voce vai fazer? Descreva o seu ataque diga quantos dados de ataque irá usar, você tem ${player.attack} de ataque e ${player.defense} de defesa. voce pode usar todos os dados no ataque, mas irá ficar sem dados para defesa ai o hit é certo!`;
+        // }
 
         // controle de flag para saber se está lutando pela primeira vez
         if (context.settings.isFirstBattle) context.settings.isFirstBattle = false;
@@ -51,7 +51,7 @@ class Battle {
         const { player, enemy } = context.combat;
         const { battle } = context.chapter;
 
-        const dice = command.match(DICE_PATTERN)[0];
+        const dice = command.match(context.inventory.inventory.find(f => f.isEquiped && f.type === "attack"))[0];
         const amountDice = diceCount(dice);
         const playerDiceAttack = diceCount(player.attack);
         const playerDiceDefense = diceCount(player.defense);
@@ -85,7 +85,8 @@ class Battle {
 
             return [
                 status,
-                battle.win.content
+                battle.win.content,
+                ...context.inventory.grantReward(context.chapter)
             ];
         }
 
@@ -102,9 +103,9 @@ class Battle {
         const { battle } = context.chapter;
 
         const enemyAttackValue = this.diceRoll(diceCount(enemy.attack));
-        const playerDefenseValue = this.diceRoll(context.combat.diceDefenseRemain + context.combat.diceAttackRemain);
+        const playerDefenseValue = this.diceRoll(context.inventory.inventory.find(f => f.isEquiped && f.type === "defense"));
 
-        this.restore(context);
+        // this.restore(context);
 
         if (enemyAttackValue < playerDefenseValue) {
             return [
@@ -133,10 +134,10 @@ class Battle {
     }
 
     // devolve todos os dados de defesa ao jogador para o próximo turno
-    restore(context) {
-        context.combat.diceDefenseRemain = diceCount(context.combat.player.defense);
-        context.combat.diceAttackRemain = 0;
-    }
+    // restore(context) {
+    //     context.combat.diceDefenseRemain = diceCount(context.combat.player.defense);
+    //     context.combat.diceAttackRemain = 0;
+    // }
 
     finishCombat(context) {
         context.combat.isFinishCombat = true;

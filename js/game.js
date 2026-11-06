@@ -32,6 +32,7 @@ class Game {
 
     init() {
         this.inventory = new Inventory();
+        this.context.inventory = this.inventory;
         this.battle = new Battle();
         this.helper = new Helper();
         this.chapters = [];
@@ -59,6 +60,12 @@ class Game {
                 func: this.inventory.equip.bind(this.inventory),
             },
             {
+                name: "usar poção",
+                keys: ["quero beber uma poção de cura", "usar a poção para me curar", "tomar o elixir"],
+                type: CONTEXT_STATE.Consult,
+                func: this.inventory.use.bind(this.inventory),
+            },
+            {
                 name: "resume story",
                 keys: ["O que você disse mesmo?", "pode repetir a história novamente?", "o que foi que você disse antes?", "pode continuar", "repita novamente"],
                 type: CONTEXT_STATE.Chapter,
@@ -78,7 +85,7 @@ class Game {
             // },
             {
                 name: "battle",
-                keys: ["atacar o inimigo", "sacar a arma e ir para o ataque", "vou atacar com 1d6", "iniciar o ataque"],
+                keys: ["atacar o inimigo", "sacar a arma e ir para o ataque", "vou atacar com a espada", "batar com a maça", "brandir a espada"],
                 type: CONTEXT_STATE.Combat,
                 func: this.battle.combat.bind(this.battle),
             }
@@ -134,6 +141,10 @@ class Game {
 
         this.context.chapter = chapter;
         this.context.currentState = CONTEXT_STATE.Chapter;
+
+        const rewardLines = this.inventory.grantReward(chapter);
+
+        if (rewardLines.length) return [this.context.chapter.content, ...rewardLines];
 
         return this.context.chapter.content;
     }

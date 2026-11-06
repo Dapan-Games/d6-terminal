@@ -37,6 +37,7 @@ const ogreHunter = [
     },
     {
         "id": "3-A",
+        "reward": "pocao_cura_menor",
         "content": "Três lobos cinzentos saltam de trás dos arbustos.",
         "parent": "2-A",
         "isFinal": false,
@@ -67,6 +68,7 @@ const ogreHunter = [
     },
     {
         "id": "3-B",
+        "reward": "pocao_cura",
         "content": "Você contorna os lobos por uma encosta coberta de samambaias. Do alto, avista o ogro cruzando uma clareira, carregando um tronco como se fosse um bastão. Você não foi percebido. Desça com cuidado e aproxime-se da clareira.",
         "parent": "2-A",
         "isFinal": false,
@@ -79,6 +81,7 @@ const ogreHunter = [
     },
     {
         "id": "4-A",
+        "reward": "maca_cravejada",
         "isBattle": true,
         "battle": {
             "win": { "content": "O Ogro da Brumafunda tomba com um estrondo que faz a clareira tremer. A caçada acabou e a recompensa é sua." },
@@ -101,6 +104,7 @@ const ogreHunter = [
     },
     {
         "id": "4-B",
+        "reward": "maca_cravejada",
         "isBattle": true,
         "battle": {
             "win": { "content": "O Ogro da Brumafunda tomba com um estrondo que faz a clareira tremer. A caçada acabou e a recompensa é sua." },
@@ -139,6 +143,7 @@ const ogreHunter = [
     },
     {
         "id": "3-C",
+        "reward": "gibao_couro",
         "isBattle": true,
         "battle": {
             "win": {
@@ -169,6 +174,7 @@ const ogreHunter = [
     },
     {
         "id": "3-D",
+        "reward": "cota_malha",
         "content": "Rio acima, você encontra uma árvore caída formando uma ponte natural. Do outro lado há pegadas fundas, um pedaço de tecido preso num espinho e o cheiro forte da fumaça. A travessia é segura; siga as marcas até a clareira.",
         "parent": "2-B",
         "isFinal": false,
@@ -181,6 +187,7 @@ const ogreHunter = [
     },
     {
         "id": "4-C",
+        "reward": "maca_cravejada",
         "isBattle": true,
         "battle": {
             "win": { "content": "O Ogro da Brumafunda tomba com um estrondo que faz a clareira tremer. A caçada acabou e a recompensa é sua." },
@@ -203,6 +210,7 @@ const ogreHunter = [
     },
     {
         "id": "4-D",
+        "reward": "maca_cravejada",
         "isBattle": true,
         "battle": {
             "win": { "content": "O Ogro da Brumafunda tomba com um estrondo que faz a clareira tremer. A caçada acabou e a recompensa é sua." },
@@ -225,6 +233,7 @@ const ogreHunter = [
     },
     {
         "id": "2-C",
+        "reward": "machadinha_lenhador",
         "content": "O acampamento está abandonado às pressas. Há uma panela virada, uma armadilha desmontada e um mapa parcialmente queimado. Pegadas de botas seguem para o norte; outras, muito maiores, vão para leste. Você pode seguir as botas ou aproveitar os materiais deixados para preparar uma armadilha.",
         "parent": "1-A",
         "isFinal": false,
@@ -241,6 +250,7 @@ const ogreHunter = [
     },
     {
         "id": "3-E",
+        "reward": "lanca_cacador",
         "isBattle": true,
         "battle": {
             "win": {
@@ -271,6 +281,7 @@ const ogreHunter = [
     },
     {
         "id": "3-F",
+        "reward": "escudo_ferro",
         "isBattle": true,
         "battle": {
             "win": {
@@ -301,6 +312,7 @@ const ogreHunter = [
     },
     {
         "id": "4-E",
+        "reward": "maca_cravejada",
         "isBattle": true,
         "battle": {
             "win": { "content": "O Ogro da Brumafunda tomba com um estrondo que faz a clareira tremer. A caçada acabou e a recompensa é sua." },
@@ -323,6 +335,7 @@ const ogreHunter = [
     },
     {
         "id": "4-F",
+        "reward": "maca_cravejada",
         "isBattle": true,
         "battle": {
             "win": { "content": "O Ogro da Brumafunda tomba com um estrondo que faz a clareira tremer. A caçada acabou e a recompensa é sua." },

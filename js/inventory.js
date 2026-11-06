@@ -1,3 +1,5 @@
+const MAX_PLAYER_HP = 7;
+
 class Inventory {
     constructor() {
         // equipamento inicial
@@ -43,6 +45,8 @@ class Inventory {
             },
         ];
 
+        this.claimedRewards = new Set();
+
         this.embedding = new Embedding();
         this.embedding.init();
     }
@@ -64,9 +68,42 @@ class Inventory {
         return this.inventory.map(item => {
             const equipedTag = item.isEquiped ? `- <span class="blue">[Equipado]</span>` : '';
             const rarityTag = item.rarity ? `<span class="${item.rarity.toLowerCase()}-rarity">[${item.rarity}]</span>` : '';
+            const stat = item.type === 'potion' ? `+${item.heal} HP` : item.dice;
 
-            return `${rarityTag} ${item.name} - <span class="yellow">${item.dice}</span>  ${equipedTag}`;
+            return `${rarityTag} ${item.name} - <span class="yellow">${stat}</span>  ${equipedTag}`;
         });
+    }
+
+    // Entrega a recompensa de um capítulo (id do ITEM_CATALOG) uma única vez e retorna as linhas a exibir
+    grantReward(chapter) {
+        const template = ITEM_CATALOG[chapter?.reward];
+
+        if (!template || this.claimedRewards.has(chapter.id)) return [];
+
+        this.claimedRewards.add(chapter.id);
+        this.inventory.push({ ...template, isEquiped: false });
+
+        const obtained = template.type === 'potion' ? 'Poção obtida' : 'Equipamento obtido';
+
+        return [`<strong>Recompensa!</strong> ${obtained}: <span class="${template.rarity.toLowerCase()}-rarity">[${template.rarity}]</span> <strong>${template.name}</strong>`];
+    }
+
+    async use(command, context) {
+        const potions = this.inventory.filter(item => item.type === 'potion');
+
+        if (potions.length === 0) return "Você não tem nenhuma poção.";
+
+        const match = await this.embedding.processing(command, potions.map(p => p.name), 0.3);
+        const potion = match ? potions[match.index] : potions[0];
+        const { player } = context;
+
+        if (player.hp >= MAX_PLAYER_HP) return "Sua vida já está cheia, guarde a poção para quando precisar.";
+
+        const before = player.hp;
+        player.hp = Math.min(MAX_PLAYER_HP, player.hp + potion.heal);
+        this.inventory.splice(this.inventory.indexOf(potion), 1);
+
+        return `Você bebe <strong>${potion.name}</strong> e recupera ${player.hp - before} HP (${player.hp}/${MAX_PLAYER_HP}).`;
     }
 
     async desctiption(command, context) {
@@ -84,6 +121,8 @@ class Inventory {
         const { index, item } = await this.findEquipamentByName(command);
 
         if (!item) return `Nenhum equipamento encontrado com esse nome`;
+
+        if (item.type === 'potion') return `Poções não são equipadas, use-a dizendo por exemplo "beber a ${item.name}".`;
 
         // desequipando tudo do mesmo tipo para equipar o selecionado, assim garantindo que so pode ter 1 por tipo
 
