@@ -5,6 +5,7 @@ const EMBEDDING_MODEL = 'Xenova/paraphrase-multilingual-MiniLM-L12-v2';
 class Embedding {
     constructor() {
         this.extractor = null;
+        this.cache = new Map();
     }
 
     async init() {
@@ -17,65 +18,44 @@ class Embedding {
         console.log("Sistema pronto!");
     }
 
-    clearCommand(command) {
-        // text-embedding-3-small
+    // Só normaliza: modelos de sentença funcionam melhor com frases naturais (sem remover stopwords)
+    normalize(text) {
+        return text.trim().toLowerCase().replace(/\s+/g, " ");
+    }
 
-        const stopwords = new Set([
-            // Artigos
-            "o", "a", "os", "as", "um", "uma", "uns", "umas",
+    // Retorna os vetores dos textos, calculando apenas os que ainda não estão no cache
+    async embed(texts) {
+        if (!this.extractor) {
+            throw new Error("O sistema ainda não foi inicializado!");
+        }
 
-            // Preposições
-            "de", "da", "do", "das", "dos", "em", "na", "no", "nas", "nos",
-            "por", "pelo", "pela", "pelos", "pelas", "para", "com", "sem",
-            "sob", "sobre", "entre", "até", "perante", "contra", "desde",
+        const normalized = texts.map(text => this.normalize(text));
+        const missing = [...new Set(normalized.filter(text => !this.cache.has(text)))];
 
-            // Conjunções
-            "e", "ou", "mas", "porém", "todavia", "contudo", "porque", "pois",
-            "portanto", "logo", "como", "se", "caso", "quando", "enquanto",
-            "embora", "conquanto", "que", "nem",
+        if (missing.length > 0) {
+            const vectors = (await this.extractor(missing, { pooling: 'mean', normalize: true })).tolist();
+            missing.forEach((text, index) => this.cache.set(text, vectors[index]));
+        }
 
-            // Pronomes Pessoais e Demonstrativos
-            "eu", "tu", "ele", "ela", "nós", "vós", "eles", "elas",
-            "me", "mim", "comigo", "te", "ti", "contigo", "se", "si", "consigo",
-            "o", "a", "lhe", "nos", "vos", "lhes",
-            "este", "esta", "estes", "estas", "isto",
-            "esse", "essa", "esses", "essas", "isso",
-            "aquele", "aquela", "aqueles", "aquelas", "aquilo",
-            "meu", "minha", "meus", "minhas", "teu", "tua", "teus", "tuas",
-            "seu", "sua", "seus", "suas", "nosso", "nossa", "nossos", "nossas",
+        return normalized.map(text => this.cache.get(text));
+    }
 
-            // Advérbios comuns de pouca relevância semântica isolada
-            "não", "sim", "mais", "muito", "pouco", "ja", "já", "agora",
-            "aqui", "ali", "la", "lá", "onde", "como", "tao", "tão",
+    // Retorna a lista de scores (cosseno) de cada frase esperada em relação ao comando
+    async scores(command, phasesExpected) {
+        const [commandVector, ...phaseVectors] = await this.embed([command, ...phasesExpected]);
 
-            // Verbos auxiliares comuns no gerúndio ou particípio/passado
-            "ser", "estar", "ter", "haver", "foi", "são", "está", "estão",
-            "tem", "têm", "era", "eram", "fui", "foram", "sido", "sendo"
-        ]);
-
-        const wordArray = command.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "").split(/\s+/);
-
-        return wordArray.filter(f => !stopwords.has(f)).join(" ");
+        return phaseVectors.map(phaseVector => this.cosineSimilarity(commandVector, phaseVector));
     }
 
     // command: string digitada | phasesExpected: lista de strings | weight: score mínimo
     // Retorna { phaseSelected, index, score } ou undefined se nenhum passar do weight
     async processing(command, phasesExpected, weight = 0.6) {
-        if (!this.extractor) {
-            throw new Error("O sistema ainda não foi inicializado!");
-        }
-
-        // command = this.clearCommand(command);
-        // phasesExpected = phasesExpected.map(m => this.clearCommand(m));
-
-        const vectors = (await this.extractor([command, ...phasesExpected], { pooling: 'mean', normalize: true })).tolist();
-        const commandVector = vectors.shift();
+        const scores = await this.scores(command, phasesExpected);
 
         let selectedIndex = -1;
         let highestScore = -1;
 
-        vectors.forEach((phaseVector, index) => {
-            const score = this.cosineSimilarity(commandVector, phaseVector);
+        scores.forEach((score, index) => {
             if (score > highestScore) {
                 highestScore = score;
                 selectedIndex = index;

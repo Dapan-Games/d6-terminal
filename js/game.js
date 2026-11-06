@@ -1,4 +1,7 @@
 const MIN_COMMAND_LENGTH = 5;
+// Score mínimo (cosseno) para aceitar um comando e diferença mínima para o 2º colocado
+const COMMAND_MIN_SCORE = 0.5;
+const COMMAND_MIN_MARGIN = 0.05;
 
 const MESSAGES = {
     tooShort: "Poderia elaborar mais seu pedido, o que você quer fazer?",
@@ -42,7 +45,7 @@ class Game {
         // Para adicionar um comando novo: inclua um item aqui com frases-exemplo (keys) e a função (func)
         this.commandMapper = [
             {
-                name: "ver inventory",
+                name: "inventory",
                 keys: [
                     "abrir o inventário",
                     "quero ver o meu inventário",
@@ -56,35 +59,36 @@ class Game {
                 func: this.inventory.list.bind(this.inventory),
             },
             {
-                name: "detalhes de equipamento",
+                name: "details equipamment",
                 keys: [
-                    "quero ver os detalhes da espada",
-                    "me descreva esse equipamento",
-                    "me fale mais sobre o escudo",
-                    "examinar a adaga com atenção",
+                    "quero ver os detalhes",
+                    "me descreva esse",
+                    "me descreva 0",
+                    "me fale mais sobre",
+                    "examinar a ",
+                    "examinar o ",
                     "o que esse item faz?",
-                    "quais são os atributos dessa armadura?",
-                    "inspecionar a minha arma"
+                    "quais são os atributos",
+                    "inspecionar a"
                 ],
                 type: CONTEXT_STATE.Consult,
                 func: this.inventory.desctiption.bind(this.inventory),
             },
             {
-                name: "equipar equipamento",
+                name: "equip",
                 keys: [
-                    "quero equipar a espada",
-                    "equipe o escudo de ferro",
-                    "vou trocar de arma para a machadinha",
-                    "colocar a cota de malha no corpo",
-                    "quero vestir a armadura",
-                    "empunhar a lança de caçador",
-                    "modificar meu equipamento para usar a adaga"
+                    "quero equipar a",
+                    "eu quero equipar a",
+                    "equipe o ",
+                    "equipe a ",
+                    "colocar a",
+                    "quero vestir a",
                 ],
                 type: CONTEXT_STATE.Consult,
                 func: this.inventory.equip.bind(this.inventory),
             },
             {
-                name: "usar poção",
+                name: "use item",
                 keys: [
                     "quero beber uma poção de cura",
                     "usar a poção para me curar",
@@ -133,14 +137,14 @@ class Game {
             {
                 name: "battle",
                 keys: [
-                    "atacar o inimigo",
-                    "sacar a arma e ir para o ataque",
-                    "vou atacar com a espada usando 2d6",
-                    "bater com a maça no monstro",
-                    "brandir a espada contra a criatura",
-                    "golpear o oponente com 1d6",
+                    "atacar o",
+                    "sacar a arma e",
+                    "vou atacar com a",
+                    "bater com",
+                    "brandir a",
+                    "golpear com",
                     "investir contra o inimigo com tudo",
-                    "lutar contra o bicho"
+                    "lutar"
                 ],
                 type: CONTEXT_STATE.Combat,
                 func: this.battle.combat.bind(this.battle),
@@ -227,21 +231,31 @@ class Game {
 
     // Retorna o comando mapeado mais parecido com o texto, se algum passar do score mínimo
     async commandBrain(wordCommand) {
-        const commandScores = [];
+        const allKeys = this.commandMapper.flatMap(element => element.keys);
+        const scores = await this.embedding.scores(wordCommand, allKeys);
 
-        for (const element of this.commandMapper) {
-            const match = await this.embedding.processing(wordCommand, element.keys, 0.5);
+        // melhor score de cada comando (maior entre as suas frases)
+        let offset = 0;
+        const commandScores = this.commandMapper.map(element => {
+            const keyScores = scores.slice(offset, offset + element.keys.length);
+            offset += element.keys.length;
 
-            if (!match) continue;
+            return { score: Math.max(...keyScores), element };
+        });
 
-            commandScores.push({ score: match.score, element });
-        }
-
-        console.log("============ score commandos =============")
-        console.log(commandScores)
         commandScores.sort((a, b) => b.score - a.score);
 
-        return commandScores[0]?.element;
+        console.log("============ score commandos =============");
+        console.log(commandScores.map(c => ({ name: c.element.name, score: c.score })));
+
+        const [best, second] = commandScores;
+
+        if (!best || best.score <= COMMAND_MIN_SCORE) return;
+
+        // evita escolher quando dois comandos estão praticamente empatados
+        // if (second && best.score - second.score < COMMAND_MIN_MARGIN) return;
+
+        return best.element;
     }
 
     // Retorna a opção do capítulo atual mais parecida com o texto
