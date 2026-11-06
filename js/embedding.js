@@ -65,8 +65,8 @@ class Embedding {
             throw new Error("O sistema ainda não foi inicializado!");
         }
 
-        command = this.clearCommand(command);
-        phasesExpected = phasesExpected.map(m => this.clearCommand(m));
+        // command = this.clearCommand(command);
+        // phasesExpected = phasesExpected.map(m => this.clearCommand(m));
 
         const vectors = (await this.extractor([command, ...phasesExpected], { pooling: 'mean', normalize: true })).tolist();
         const commandVector = vectors.shift();
@@ -83,6 +83,7 @@ class Embedding {
         });
 
         console.log({
+            commandWord: command,
             phaseSelected: phasesExpected[selectedIndex],
             index: selectedIndex,
             score: highestScore,

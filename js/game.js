@@ -43,37 +43,84 @@ class Game {
         this.commandMapper = [
             {
                 name: "ver inventory",
-                keys: ["abrir o inventário", "o que tem no inventario", "olhar a bolsa para ver o que tem", "o que estou usando"],
+                keys: [
+                    "abrir o inventário",
+                    "quero ver o meu inventário",
+                    "o que tem na minha bolsa?",
+                    "olhar a mochila para ver o que eu tenho",
+                    "listar todos os meus itens",
+                    "quais equipamentos eu estou usando agora?",
+                    "mostre meus itens e poções"
+                ],
                 type: CONTEXT_STATE.Consult,
                 func: this.inventory.list.bind(this.inventory),
             },
             {
                 name: "detalhes de equipamento",
-                keys: ["quero detalhes", "me fale mais sobre", "quero ver"],
+                keys: [
+                    "quero ver os detalhes da espada",
+                    "me descreva esse equipamento",
+                    "me fale mais sobre o escudo",
+                    "examinar a adaga com atenção",
+                    "o que esse item faz?",
+                    "quais são os atributos dessa armadura?",
+                    "inspecionar a minha arma"
+                ],
                 type: CONTEXT_STATE.Consult,
                 func: this.inventory.desctiption.bind(this.inventory),
             },
             {
                 name: "equipar equipamento",
-                keys: ["quero equipar a espada", "equipe o escudo", "quero modificar meu equipamento para"],
+                keys: [
+                    "quero equipar a espada",
+                    "equipe o escudo de ferro",
+                    "vou trocar de arma para a machadinha",
+                    "colocar a cota de malha no corpo",
+                    "quero vestir a armadura",
+                    "empunhar a lança de caçador",
+                    "modificar meu equipamento para usar a adaga"
+                ],
                 type: CONTEXT_STATE.Consult,
                 func: this.inventory.equip.bind(this.inventory),
             },
             {
                 name: "usar poção",
-                keys: ["quero beber uma poção de cura", "usar a poção para me curar", "tomar o elixir"],
+                keys: [
+                    "quero beber uma poção de cura",
+                    "usar a poção para me curar",
+                    "tomar o elixir para recuperar vida",
+                    "vou beber a poção para me recuperar",
+                    "estou ferido, preciso me curar",
+                    "consumir uma poção para recuperar meus pontos de vida"
+                ],
                 type: CONTEXT_STATE.Consult,
                 func: this.inventory.use.bind(this.inventory),
             },
             {
                 name: "resume story",
-                keys: ["O que você disse mesmo?", "pode repetir a história novamente?", "o que foi que você disse antes?", "pode continuar", "repita novamente"],
+                keys: [
+                    "o que você disse mesmo?",
+                    "pode repetir a história novamente?",
+                    "o que foi que você disse antes?",
+                    "não entendi a cena, repita por favor",
+                    "pode narrar de novo o que está acontecendo?",
+                    "qual é a situação atual?",
+                    "pode continuar a história"
+                ],
                 type: CONTEXT_STATE.Chapter,
                 func: (_, context) => this.narrative(context.chapter),
             },
             {
                 name: "help",
-                keys: ["não sei o que fazer, me ajuda", "como eu jogo esse jogo?", "tenho uma dúvida, pode me explicar como funciona?", "quais são os comandos que posso usar?", "como funciona a batalha?"],
+                keys: [
+                    "não sei o que fazer, me ajuda",
+                    "como eu jogo esse jogo?",
+                    "tenho uma dúvida, pode me explicar como funciona?",
+                    "quais são os comandos que posso usar?",
+                    "como funciona a batalha?",
+                    "como faço para atacar ou me defender?",
+                    "explique as regras do jogo"
+                ],
                 type: CONTEXT_STATE.Consult,
                 func: (_, context) => this.helper.explain(context),
             },
@@ -85,7 +132,16 @@ class Game {
             // },
             {
                 name: "battle",
-                keys: ["atacar o inimigo", "sacar a arma e ir para o ataque", "vou atacar com a espada", "batar com a maça", "brandir a espada"],
+                keys: [
+                    "atacar o inimigo",
+                    "sacar a arma e ir para o ataque",
+                    "vou atacar com a espada usando 2d6",
+                    "bater com a maça no monstro",
+                    "brandir a espada contra a criatura",
+                    "golpear o oponente com 1d6",
+                    "investir contra o inimigo com tudo",
+                    "lutar contra o bicho"
+                ],
                 type: CONTEXT_STATE.Combat,
                 func: this.battle.combat.bind(this.battle),
             }
@@ -181,6 +237,8 @@ class Game {
             commandScores.push({ score: match.score, element });
         }
 
+        console.log("============ score commandos =============")
+        console.log(commandScores)
         commandScores.sort((a, b) => b.score - a.score);
 
         return commandScores[0]?.element;
