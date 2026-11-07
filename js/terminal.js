@@ -17,7 +17,8 @@ const masterLine = (text, context) => {
         `<div><p class="yellow">$> Mestre: ${badgeInCombat}</p><div class="card">${text}</div></div>`,
         context.is(CONTEXT_STATE.Chapter) && `<div><p class="yellow">$> Mestre: o que você quer fazer?</p> ${actions}</div>` || "",
         context.is(CONTEXT_STATE.Consult) && `<div><p class="yellow">$> Mestre: </p> Narrativa em espera, diga 'continuar' para avançarmos no enredo. </div>` || "",
-        (context.is(CONTEXT_STATE.Combat) && context.settings.isFirstBattle) && `<div><p class="yellow">$> Mestre: <span class="blue">[DICA]</span></p>Em combate, a narrativa e a mecânica caminham juntas. Diga-me como seu personagem executa a investida e quantos dados você está lançando — seja <strong class="yellow">1d6</strong>, <strong class="yellow">2d6</strong> ou mais. Confirme sempre no seu inventário o que sua arma tem capacidade de causar.</div>` || "",
+        (context.is(CONTEXT_STATE.Combat) && context.settings.isFirstBattle) && `<div><p class="yellow">$> Mestre: <span class="blue">[DICA]</span></p>Vamos iniciar seu primeiro combate, é simples, basicamente ataque! fique de olho em sua vida, use poções e fique de olho nas suas armas, é sempre bom andar bem preparado pois nunca se sabe quando irá precisar se defender!</div>` || "",
+        (context.is(CONTEXT_STATE.Combat) && !context.inventory.hasEquiped()) && `<div><p class="yellow">$> Mestre: <span class="red">[ALERTA]</span></p>Você está sem arma equipada, veja seu inventário e equipe uma arma para batalhar.</div>` || "",
         context.is(CONTEXT_STATE.EndGame) && `<div><p class="yellow">$> Mestre: <span class="blue">[DICA]</span></p>Quer jogar outra aventura? ou tentar algo diferente? recarregue a pagina!.</div>` || "",
     ];
 }

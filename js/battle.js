@@ -10,8 +10,9 @@ function randomItem(list) {
 }
 
 class Battle {
-    diceRoll(amount) {
+    diceRoll(dice) {
         let total = 0;
+        let amount = parseInt(dice)
 
         for (let i = 0; i < amount; i++) {
             total += Math.floor(Math.random() * 6) + 1;
@@ -21,16 +22,12 @@ class Battle {
     }
 
     // Retorna uma instrução (string) se o jogador não informou dados, senão os dois turnos [jogador, inimigo]
-    combat(command, context) {
-        // if (!DICE_PATTERN.test(command)) {
-        //     const { player } = context.combat;
-        //     return `o que voce vai fazer? Descreva o seu ataque diga quantos dados de ataque irá usar, você tem ${player.attack} de ataque e ${player.defense} de defesa. voce pode usar todos os dados no ataque, mas irá ficar sem dados para defesa ai o hit é certo!`;
-        // }
+    combat(_, context) {
 
         // controle de flag para saber se está lutando pela primeira vez
         if (context.settings.isFirstBattle) context.settings.isFirstBattle = false;
 
-        const playerNarrative = this.playerAttack(command, context);
+        const playerNarrative = this.playerAttack(context);
         const enemyNarrative = this.enemyAttack(context);
 
         const isEnemyDie = context.combat.enemy.hp === 0;
@@ -42,30 +39,21 @@ class Battle {
         if (playerNarrative) message.push(...playerNarrative);
         if (enemyNarrative) message.push("", ...enemyNarrative);
 
-        if (isEnemyDie) this.finishCombat(context);
+        if (isEnemyDie) context.combat.isFinishCombat = true;
 
         return message;
     }
 
-    playerAttack(command, context) {
+    playerAttack(context) {
         const { player, enemy } = context.combat;
         const { battle } = context.chapter;
 
-        const dice = command.match(context.inventory.inventory.find(f => f.isEquiped && f.type === "attack"))[0];
-        const amountDice = diceCount(dice);
-        const playerDiceAttack = diceCount(player.attack);
-        const playerDiceDefense = diceCount(player.defense);
-        const enemyDiceDefense = diceCount(enemy.defense);
+        const equipament = context.inventory.inventory.find(f => f.isEquiped && f.type === "attack");
 
-        if (amountDice > playerDiceAttack + playerDiceDefense) {
-            return `Você não tem isso tudo de dados, você tem no maximo ${playerDiceAttack} dados de ataque e ${playerDiceDefense} dados de defesa`;
-        }
+        const playerDiceAttack = equipament.dice;
+        const enemyDiceDefense = enemy.defense;
 
-        // dados não usados no ataque sobram para a defesa contra o contra-ataque
-        if (amountDice > playerDiceAttack) context.combat.diceDefenseRemain = (playerDiceAttack + playerDiceDefense) - amountDice;
-        if (amountDice < playerDiceAttack) context.combat.diceAttackRemain = playerDiceAttack - amountDice;
-
-        const playerAttackValue = this.diceRoll(amountDice);
+        const playerAttackValue = this.diceRoll(playerDiceAttack);
         const enemyDefenseValue = this.diceRoll(enemyDiceDefense);
 
         if (playerAttackValue < enemyDefenseValue) {
@@ -75,17 +63,19 @@ class Battle {
             ];
         }
 
-        enemy.hp -= 1;
+        enemy.hp -= playerAttackValue;
 
-        const status = `Você <span class="green">acerta</span> o ataque.`;
+        const status = `Você <span class="green">acerta</span> o ataque. causando <span class="yellow">${playerAttackValue}</span> de dano.`;
 
-        if (enemy.hp == 0) {
+        if (enemy.hp <= 0) {
             context.chapter.isBattle = false;
+            context.chapter.content = battle.win.content;
             context.currentState = CONTEXT_STATE.Chapter
 
             return [
                 status,
                 battle.win.content,
+                "",
                 ...context.inventory.grantReward(context.chapter)
             ];
         }
@@ -102,10 +92,10 @@ class Battle {
         const { player, enemy } = context.combat;
         const { battle } = context.chapter;
 
-        const enemyAttackValue = this.diceRoll(diceCount(enemy.attack));
-        const playerDefenseValue = this.diceRoll(context.inventory.inventory.find(f => f.isEquiped && f.type === "defense"));
+        const equipament = context.inventory.inventory.find(f => f.isEquiped && f.type === "defense");
 
-        // this.restore(context);
+        const enemyAttackValue = this.diceRoll(enemy.attack);
+        const playerDefenseValue = this.diceRoll(equipament.dice);
 
         if (enemyAttackValue < playerDefenseValue) {
             return [
@@ -114,10 +104,10 @@ class Battle {
             ];
         }
 
-        player.hp -= 1;
-        const status = `${enemy.name} <span class="green">acerta</span> o ataque.`;
+        player.hp -= enemyAttackValue;
+        const status = `${enemy.name} <span class="green">acerta</span> o ataque. causando <span class="yellow">${enemyAttackValue}</span> de dano.`;
 
-        if (player.hp == 0) {
+        if (player.hp <= 0) {
             context.chapter.isBattle = false;
             context.chapter.isFinal = true;
 
@@ -131,16 +121,6 @@ class Battle {
             status,
             randomItem(battle.attack)
         ];
-    }
-
-    // devolve todos os dados de defesa ao jogador para o próximo turno
-    // restore(context) {
-    //     context.combat.diceDefenseRemain = diceCount(context.combat.player.defense);
-    //     context.combat.diceAttackRemain = 0;
-    // }
-
-    finishCombat(context) {
-        context.combat.isFinishCombat = true;
     }
 }
 

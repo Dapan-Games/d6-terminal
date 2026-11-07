@@ -137,7 +137,7 @@ class Game {
 
     startGame(chapters) {
         this.chapters = chapters;
-        const chapter = chapters[2];
+        const chapter = chapters[0];
 
         // const internalCommand = this.commandMapper[0];
         // this.context.currentState = internalCommand.type;
@@ -259,9 +259,9 @@ class Game {
 
         if (brain.type === CONTEXT_STATE.Chapter) return this.nextNarrative(brain.element);
 
-        const isvalid = brain.element.validations.every(validation => validation(this.context));
+        const isvalid = brain.element.validations?.every(validation => validation(this.context));
 
-        if (!isvalid) {
+        if (brain.element.validations && !isvalid) {
             this.context.currentState = CONTEXT_STATE.Consult;
             return `Você não pode fazer isso agora.`;
         }

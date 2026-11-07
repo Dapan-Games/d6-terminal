@@ -10,6 +10,35 @@ O versionamento segue o [SemVer](https://semver.org/lang/pt-BR/) (`MAJOR.MINOR.P
 
 Enquanto o jogo estiver abaixo da `1.0.0`, ele é considerado em desenvolvimento inicial, e novas funcionalidades incrementam o MINOR.
 
+## [0.13.0] - 2026-11-07 - não commitado
+
+### Adicionado
+- Enredo de `ogreHunterChapter.js` expandido de 16 para 33 capítulos, mantendo a caçada ao ogro como linha principal e a mesma estrutura de capítulos.
+- Prólogo na Vila de Pedraalta, com a taverneira Hilda, o ferreiro Brogan (armadura de couro reforçado) e a curandeira Maren (poção).
+- Caminho da trilha: mochila esquecida com poção e diário, torre de vigia em ruínas com baú (espada longa de aço) e mini-boss Lobo-Alfa cicatrizado.
+- Caminho do riacho: missão secundária do barqueiro Orvyl (buscar musgo-lunar para curar a filha), mini-boss Guardião do Santuário e travessia de canoa até a clareira do ogro.
+- Caminho do acampamento: baú trancado com elmo, encontro com o desertor Dorian (conversar ou lutar), missão secundária do corno de caça do capitão Harkon e mini-boss Urso-das-cavernas.
+- Novas recompensas distribuídas pelo enredo, usando equipamentos e poções que ainda não eram usados.
+
+### Alterado
+- Cada caminho continua terminando em um ogro final próprio (`enemy` independente), com textos de chegada específicos.
+- Os ids dos capítulos foram renumerados por profundidade (`1-A` a `10-A`).
+
+### Corrigido
+- `startGame` em `js/game.js` iniciava em `chapters[2]` (resquício de depuração) e agora inicia em `chapters[0]`.
+
+## [0.12.0] - 2026-11-06 - não commitado
+
+### Adicionado
+- 13 novos equipamentos e poções em `js/items.js`, totalizando 28 itens: 12 de ataque, 10 de defesa e 6 poções.
+
+### Alterado
+- As propriedades dos itens em `js/items.js` passaram a usar nomes em inglês (`snake_case`).
+- Os `reward` em `ogreHunterChapter.js` foram atualizados para os novos ids.
+
+### Corrigido
+- Dano de `steel_longsword` ajustado para 3d6.
+
 ## [0.11.0] - 2026-11-06 - `080aa23`
 
 ### Adicionado

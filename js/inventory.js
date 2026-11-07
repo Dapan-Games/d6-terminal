@@ -5,44 +5,51 @@ class Inventory {
         // equipamento inicial
         this.inventory = [
             {
+                name: 'Poção de Cura Menor',
+                description: 'liquido vermelho e doce, fecha pequenos ferimentos',
+                type: 'potion',
+                heal: 2,
+                rarity: 'Comum'
+            },
+            {
                 name: 'Adaga',
                 description: 'adaga e boa pra cortar coisas',
                 type: 'attack',
-                dice: '1d6',
-                isEquiped: false,
-                rarity: 'Comum'
-            },
-            {
-                name: 'Espada Curta',
-                description: 'espada e boa pra cortar coisas',
-                type: 'attack',
                 dice: '2d6',
-                isEquiped: false,
+                isEquiped: true,
                 rarity: 'Comum'
             },
-            {
-                name: 'Espada longa',
-                description: 'espada grande e boa pra cortar ao meio',
-                type: 'attack',
-                dice: '3d6',
-                special: '1d6',
-                isEquiped: true,
-                rarity: 'Raro'
-            },
+            // {
+            //     name: 'Espada Curta',
+            //     description: 'espada e boa pra cortar coisas',
+            //     type: 'attack',
+            //     dice: '2d6',
+            //     isEquiped: false,
+            //     rarity: 'Comum'
+            // },
+            // {
+            //     name: 'Espada longa',
+            //     description: 'espada grande e boa pra cortar ao meio',
+            //     type: 'attack',
+            //     dice: '3d6',
+            //     special: '1d6',
+            //     isEquiped: true,
+            //     rarity: 'Raro'
+            // },
             {
                 name: 'Escudo de Madeira',
                 type: 'defense',
                 dice: '1d6',
-                isEquiped: false,
-                rarity: 'Epico'
-            },
-            {
-                name: 'Espada de Haikiu',
-                type: 'defense',
-                dice: '4d6',
                 isEquiped: true,
-                rarity: 'Lendario'
+                rarity: 'Comum'
             },
+            // {
+            //     name: 'Espada de Haikiu',
+            //     type: 'defense',
+            //     dice: '4d6',
+            //     isEquiped: true,
+            //     rarity: 'Lendario'
+            // },
         ];
 
         this.claimedRewards = new Set();
@@ -68,7 +75,7 @@ class Inventory {
         return this.inventory.map(item => {
             const equipedTag = item.isEquiped ? `- <span class="blue">[Equipado]</span>` : '';
             const rarityTag = item.rarity ? `<span class="${item.rarity.toLowerCase()}-rarity">[${item.rarity}]</span>` : '';
-            const stat = item.type === 'potion' ? `+${item.heal} HP` : item.dice;
+            const stat = item.type === 'potion' ? `+${item.heal} HP` : `${item.dice}<span class="yellow">(${parseInt(item.dice)}~${parseInt(item.dice) * 6})</span> [${(item.type === "attack" ? "ATK" : "DEF")}]`;
 
             return `${rarityTag} ${item.name} - <span class="yellow">${stat}</span>  ${equipedTag}`;
         });
@@ -143,6 +150,10 @@ class Inventory {
         return [
             `<span class="${item.rarity.toLowerCase()}-rarity">[${item.rarity}]</span> <strong>${item.name}</strong> equipado!`,
         ]
+    }
+
+    hasEquiped() {
+        return this.inventory.some(f => f.type === 'attack' && f.isEquiped);
     }
 }
 
