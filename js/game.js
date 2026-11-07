@@ -1,6 +1,6 @@
 const MIN_COMMAND_LENGTH = 5;
 // Score mínimo (cosseno) para aceitar um comando e diferença mínima para o 2º colocado
-const COMMAND_MIN_SCORE = 0.68;
+const COMMAND_MIN_SCORE = 0.6;
 
 const MESSAGES = {
     tooShort: "Poderia elaborar mais seu pedido, o que você quer fazer?",
@@ -57,11 +57,11 @@ class Game {
             },
             {
                 name: "equip",
-                keys: ["equipar"],
+                keys: ["equipar", "equip", "usar clava de madeira", "equipar clava de madeira"],
                 type: CONTEXT_STATE.Consult,
                 func: this.inventory.equip.bind(this.inventory),
                 validations: [
-                    (context) => !context.is(CONTEXT_STATE.Combat)
+                    // (context) => !context.is(CONTEXT_STATE.Combat)
                 ]
             },
             {
@@ -131,7 +131,7 @@ class Game {
             defense: defenseDice?.dice || "0d6",
             special: "0d6",
             debility: "0d6",
-            hp: 7,
+            hp: 50,
         };
     }
 
@@ -172,7 +172,7 @@ class Game {
 
         const rewardLines = this.inventory.grantReward(chapter);
 
-        if (rewardLines.length) return [this.context.chapter.content, ...rewardLines];
+        if (rewardLines.length) return [this.context.chapter.content, "", ...rewardLines];
 
         return this.context.chapter.content;
     }

@@ -5,51 +5,19 @@ class Inventory {
         // equipamento inicial
         this.inventory = [
             {
-                name: 'Poção de Cura Menor',
-                description: 'liquido vermelho e doce, fecha pequenos ferimentos',
-                type: 'potion',
-                heal: 2,
-                rarity: 'Comum'
-            },
-            {
-                name: 'Adaga',
-                description: 'adaga e boa pra cortar coisas',
+                name: 'Clava de Madeira',
+                description: 'tronco grosso lapidado de forma tosca, simples mas eficaz',
                 type: 'attack',
-                dice: '2d6',
-                isEquiped: true,
-                rarity: 'Comum'
-            },
-            // {
-            //     name: 'Espada Curta',
-            //     description: 'espada e boa pra cortar coisas',
-            //     type: 'attack',
-            //     dice: '2d6',
-            //     isEquiped: false,
-            //     rarity: 'Comum'
-            // },
-            // {
-            //     name: 'Espada longa',
-            //     description: 'espada grande e boa pra cortar ao meio',
-            //     type: 'attack',
-            //     dice: '3d6',
-            //     special: '1d6',
-            //     isEquiped: true,
-            //     rarity: 'Raro'
-            // },
-            {
-                name: 'Escudo de Madeira',
-                type: 'defense',
                 dice: '1d6',
-                isEquiped: true,
                 rarity: 'Comum'
             },
-            // {
-            //     name: 'Espada de Haikiu',
-            //     type: 'defense',
-            //     dice: '4d6',
-            //     isEquiped: true,
-            //     rarity: 'Lendario'
-            // },
+            {
+                name: 'Broquel de Madeira',
+                description: 'escudo pequeno e leve, bom para desviar golpes rapidos',
+                type: 'defense', 
+                dice: '1d6', 
+                rarity: 'Comum'
+            }
         ];
 
         this.claimedRewards = new Set();

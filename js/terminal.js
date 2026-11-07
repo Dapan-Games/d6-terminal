@@ -18,7 +18,7 @@ const masterLine = (text, context) => {
         context.is(CONTEXT_STATE.Chapter) && `<div><p class="yellow">$> Mestre: o que você quer fazer?</p> ${actions}</div>` || "",
         context.is(CONTEXT_STATE.Consult) && `<div><p class="yellow">$> Mestre: </p> Narrativa em espera, diga 'continuar' para avançarmos no enredo. </div>` || "",
         (context.is(CONTEXT_STATE.Combat) && context.settings.isFirstBattle) && `<div><p class="yellow">$> Mestre: <span class="blue">[DICA]</span></p>Vamos iniciar seu primeiro combate, é simples, basicamente ataque! fique de olho em sua vida, use poções e fique de olho nas suas armas, é sempre bom andar bem preparado pois nunca se sabe quando irá precisar se defender!</div>` || "",
-        (context.is(CONTEXT_STATE.Combat) && !context.inventory.hasEquiped()) && `<div><p class="yellow">$> Mestre: <span class="red">[ALERTA]</span></p>Você está sem arma equipada, veja seu inventário e equipe uma arma para batalhar.</div>` || "",
+        (context.is(CONTEXT_STATE.Combat) && !context.inventory.hasEquiped()) && `<div><p class="yellow">$> Mestre: <span class="red">[ALERTA]</span></p>Você está sem arma equipada, veja seu inventário e equipe uma arma para batalhar. use o comando "help"</div>` || "",
         context.is(CONTEXT_STATE.EndGame) && `<div><p class="yellow">$> Mestre: <span class="blue">[DICA]</span></p>Quer jogar outra aventura? ou tentar algo diferente? recarregue a pagina!.</div>` || "",
     ];
 }
@@ -65,7 +65,7 @@ class Terminal {
         const itens = Array.from(html.children);
 
         itens.forEach(item => {
-            this.history.appendChild(item);
+            this.history.prepend(item);
         });
 
         this.terminal.scrollTop = 0

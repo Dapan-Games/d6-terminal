@@ -10,7 +10,7 @@ O versionamento segue o [SemVer](https://semver.org/lang/pt-BR/) (`MAJOR.MINOR.P
 
 Enquanto o jogo estiver abaixo da `1.0.0`, ele é considerado em desenvolvimento inicial, e novas funcionalidades incrementam o MINOR.
 
-## [0.13.0] - 2026-11-07 - não commitado
+## [0.13.0] - 2026-11-07
 
 ### Adicionado
 - Enredo de `ogreHunterChapter.js` expandido de 16 para 33 capítulos, mantendo a caçada ao ogro como linha principal e a mesma estrutura de capítulos.
@@ -27,7 +27,7 @@ Enquanto o jogo estiver abaixo da `1.0.0`, ele é considerado em desenvolvimento
 ### Corrigido
 - `startGame` em `js/game.js` iniciava em `chapters[2]` (resquício de depuração) e agora inicia em `chapters[0]`.
 
-## [0.12.0] - 2026-11-06 - não commitado
+## [0.12.0] - 2026-11-06
 
 ### Adicionado
 - 13 novos equipamentos e poções em `js/items.js`, totalizando 28 itens: 12 de ataque, 10 de defesa e 6 poções.
