@@ -10,6 +10,34 @@ O versionamento segue o [SemVer](https://semver.org/lang/pt-BR/) (`MAJOR.MINOR.P
 
 Enquanto o jogo estiver abaixo da `1.0.0`, ele é considerado em desenvolvimento inicial, e novas funcionalidades incrementam o MINOR.
 
+## [0.11.0] - 2026-11-06 - `080aa23`
+
+### Adicionado
+- Método único `brain` em `js/game.js`, que compara o texto digitado com os comandos internos e com as opções do capítulo ao mesmo tempo e escolhe a melhor correspondência.
+- Opções com `func` passam a ser tratadas como comandos internos (`isInternalCommand`).
+- Campo `validations` nos comandos. O comando de equipar não pode ser usado durante o combate e responde "Você não pode fazer isso agora."
+- Comando `reload game` ("resetar o jogo"), que recarrega a página.
+- Ajuda com lista de comandos: Inventário, Analisar, Equipar e Beber, cada um com sua descrição.
+
+### Alterado
+- `CONTEXT_STATE` passa a usar textos (`'CHAPTER'`, `'COMBAT'`, etc.) no lugar de números.
+- Frases-exemplo (`keys`) de inventário, detalhes, equipar e poção reduzidas a palavras-chave curtas ("inventário", "bolsa", "analisar", "equipar", "beber").
+- `COMMAND_MIN_SCORE` subiu de 0,5 para 0,68, e a margem mínima sobre o segundo colocado (`COMMAND_MIN_MARGIN`) foi removida.
+- Mensagem "Não entendi" mais completa, e a ajuda coloca o jogo em estado de consulta.
+- Erros agora também aparecem no console (`console.error`).
+
+### Corrigido
+- Detalhes de equipamento não quebram mais quando nenhum item é encontrado pelo nome.
+
+### Removido
+- `commandBrain` e `chapterBrain`, substituídos por `brain`.
+- Logs de depuração em `js/embedding.js` e `js/game.js`.
+
+## [0.10.0] - 2026-11-06 - `6b4fabd`
+
+### Adicionado
+- Arquivo `CHANGELOG.md` com o histórico de versões do projeto.
+
 ## [0.9.0] - 2026-11-06 - `430e17a`
 
 ### Adicionado
