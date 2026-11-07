@@ -9,6 +9,8 @@ class Helper {
 
     explain(context) {
         const inBattle = context.chapter?.isBattle === true;
+        
+        context.currentState = CONTEXT_STATE.Consult;
 
         return [
             this.basics(),
@@ -34,7 +36,28 @@ class Helper {
     }
 
     commandsHelp() {
-        return "<b>Você também pode pedir:</b><br>- \"abrir o inventário\" para ver o que está usando<br>- \"pode repetir a história?\" para ouvir a cena de novo<br>- \"ajuda\" para ver esta explicação a qualquer momento";
+        const commands = [
+            {
+                command: "Inventário",
+                description: "Lista todos os items que você possui"
+            },
+            {
+                command: "Analisar [equipamento/item]",
+                description: "mostra detalhes sobre o item como nome, descrição, etc."
+            },
+            {
+                command: "Equipar [arma/item]",
+                description: "Equipa o item informado, como usar nova espada ou escudo."
+            },
+            {
+                command: "Beber [item]",
+                description: "Ação para beber uma poção"
+            },
+        ]
+
+        const render = commands.map(m => `<br>- <span class="yellow">${m.command}</span> - ${m.description}`);
+
+        return `<b>Você também pode dar commando:</b>${render}`;
     }
 }
 

@@ -62,13 +62,6 @@ class Embedding {
             }
         });
 
-        console.log({
-            commandWord: command,
-            phaseSelected: phasesExpected[selectedIndex],
-            index: selectedIndex,
-            score: highestScore,
-            condition: highestScore > weight
-        });
 
         if (highestScore > weight) {
             return {

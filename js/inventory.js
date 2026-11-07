@@ -107,7 +107,7 @@ class Inventory {
     }
 
     async desctiption(command, context) {
-        const { item } = await this.findEquipamentByName(command);
+        const { item = undefined } = await this.findEquipamentByName(command);
 
         if (!item) return `Nenhum equipamento encontrado com esse nome`;
 

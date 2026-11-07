@@ -89,6 +89,7 @@ class Terminal {
         try {
             await this.printResult(await this.game.processor(command));
         } catch (err) {
+            console.error(err)
             this.printTerminal(err.message || String(err), 'error');
         }
     }

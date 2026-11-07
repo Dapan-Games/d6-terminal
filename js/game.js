@@ -1,22 +1,21 @@
 const MIN_COMMAND_LENGTH = 5;
 // Score mínimo (cosseno) para aceitar um comando e diferença mínima para o 2º colocado
-const COMMAND_MIN_SCORE = 0.5;
-const COMMAND_MIN_MARGIN = 0.05;
+const COMMAND_MIN_SCORE = 0.68;
 
 const MESSAGES = {
     tooShort: "Poderia elaborar mais seu pedido, o que você quer fazer?",
-    notUnderstood: "Não entendi. Se estiver com dúvidas, digite \"ajuda\".",
+    notUnderstood: "Não entendi o que você quiz dizer. Se estiver com dúvidas, digite \"ajuda\".",
     unclearChoice: "Não ficou claro o que deseja fazer, pode tentar me dizer de outra forma?",
     thanks: "Obrigado por jogar d6 Terminal - by Joeverson Santos",
     inBattle: "o que voce vai fazer? (se for atacar diga quantos dados 1d6, 4d6)"
 };
 const CONTEXT_STATE = {
-    None: 0,
-    Chapter: 1,
-    Consult: 2,
-    Combat: 3,
-    System: 4,
-    EndGame: 5
+    None: 'NONE',
+    Chapter: 'CHAPTER',
+    Consult: 'CONSULT',
+    Combat: 'COMBAT',
+    System: 'SYSTEM',
+    EndGame: 'END_GAME'
 }
 
 class Game {
@@ -46,70 +45,40 @@ class Game {
         this.commandMapper = [
             {
                 name: "inventory",
-                keys: [
-                    "abrir o inventário",
-                    "quero ver o meu inventário",
-                    "o que tem na minha bolsa?",
-                    "olhar a mochila para ver o que eu tenho",
-                    "listar todos os meus itens",
-                    "quais equipamentos eu estou usando agora?",
-                    "mostre meus itens e poções"
-                ],
+                keys: ["inventário", "bolsa"],
                 type: CONTEXT_STATE.Consult,
-                func: this.inventory.list.bind(this.inventory),
+                func: this.inventory.list.bind(this.inventory)
             },
             {
                 name: "details equipamment",
-                keys: [
-                    "quero ver os detalhes",
-                    "me descreva esse",
-                    "me descreva 0",
-                    "me fale mais sobre",
-                    "examinar a ",
-                    "examinar o ",
-                    "o que esse item faz?",
-                    "quais são os atributos",
-                    "inspecionar a"
-                ],
+                keys: ["analisar"],
                 type: CONTEXT_STATE.Consult,
                 func: this.inventory.desctiption.bind(this.inventory),
             },
             {
                 name: "equip",
-                keys: [
-                    "quero equipar a",
-                    "eu quero equipar a",
-                    "equipe o ",
-                    "equipe a ",
-                    "colocar a",
-                    "quero vestir a",
-                ],
+                keys: ["equipar"],
                 type: CONTEXT_STATE.Consult,
                 func: this.inventory.equip.bind(this.inventory),
+                validations: [
+                    (context) => !context.is(CONTEXT_STATE.Combat)
+                ]
             },
             {
                 name: "use item",
-                keys: [
-                    "quero beber uma poção de cura",
-                    "usar a poção para me curar",
-                    "tomar o elixir para recuperar vida",
-                    "vou beber a poção para me recuperar",
-                    "estou ferido, preciso me curar",
-                    "consumir uma poção para recuperar meus pontos de vida"
-                ],
+                keys: ["beber"],
                 type: CONTEXT_STATE.Consult,
                 func: this.inventory.use.bind(this.inventory),
             },
             {
                 name: "resume story",
                 keys: [
-                    "o que você disse mesmo?",
-                    "pode repetir a história novamente?",
-                    "o que foi que você disse antes?",
-                    "não entendi a cena, repita por favor",
-                    "pode narrar de novo o que está acontecendo?",
-                    "qual é a situação atual?",
-                    "pode continuar a história"
+                    "quero ouvir a história de novo",
+                    "me repete o que você disse",
+                    "peraí, o que tava acontecendo mesmo?",
+                    "como estava a cena atual?",
+                    "repetir",
+                    "continuar história"
                 ],
                 type: CONTEXT_STATE.Chapter,
                 func: (_, context) => this.narrative(context.chapter),
@@ -117,33 +86,30 @@ class Game {
             {
                 name: "help",
                 keys: [
-                    "não sei o que fazer, me ajuda",
-                    "como eu jogo esse jogo?",
-                    "tenho uma dúvida, pode me explicar como funciona?",
-                    "quais são os comandos que posso usar?",
-                    "como funciona a batalha?",
-                    "como faço para atacar ou me defender?",
-                    "explique as regras do jogo"
+                    "quero saber como jogar",
+                    "me explica como esse jogo funciona",
+                    "tô perdido, o que eu faço?",
+                    "tem algum tutorial aí?",
+                    "ajuda",
+                    "como jogar"
                 ],
                 type: CONTEXT_STATE.Consult,
                 func: (_, context) => this.helper.explain(context),
             },
-            // {
-            //     name: "reload game",
-            //     keys: ["quero começar tudo de novo, resete o jogo", "recomeçar o jogo novamente", "resetar o jogo"],
-            //     type: CONTEXT_STATE.System,
-            //     func: () => location.reload(),
-            // },
+            {
+                name: "reload game",
+                keys: ["resetar o jogo"],
+                type: CONTEXT_STATE.System,
+                func: () => location.reload(),
+            },
             {
                 name: "battle",
                 keys: [
-                    "atacar o",
-                    "sacar a arma e",
-                    "vou atacar com a",
-                    "bater com",
-                    "brandir a",
-                    "golpear com",
-                    "investir contra o inimigo com tudo",
+                    "quero atacar o inimigo",
+                    "me prepara pra atacar com a arma",
+                    "bora partir pra cima do bicho",
+                    "dá pra bater nele agora?",
+                    "atacar",
                     "lutar"
                 ],
                 type: CONTEXT_STATE.Combat,
@@ -171,16 +137,22 @@ class Game {
 
     startGame(chapters) {
         this.chapters = chapters;
-        const chapter = chapters[0];
+        const chapter = chapters[2];
 
-        // this.context.currentState = CONTEXT_STATE.Consult
-        // return this.commandMapper[0].func(undefined, this.context);
+        // const internalCommand = this.commandMapper[0];
+        // this.context.currentState = internalCommand.type;
+        // return internalCommand.func(undefined, this.context);
+
         return this.narrative(chapter);
     }
 
     // --- Narrativa ---
-
+    /**
+     * metodo valida se vem func(que indica que é um tipo de comando interno)
+    */
     nextNarrative(option) {
+        if (option?.isInternalCommand) return option.func(undefined, this.context);
+
         const nextChapter = this.chapters.find(chapter => chapter.id === option.next);
 
         if (!nextChapter) return MESSAGES.unclearChoice;
@@ -189,10 +161,6 @@ class Game {
     }
 
     narrative(chapter) {
-        // const chapter = isResume ? this.context.chapter : this.chapters.find(chapter => chapter.id === option.next);
-
-        console.log(chapter);
-
         if (!chapter) return MESSAGES.unclearChoice;
 
         if (this.context.chapter == chapter && chapter.isFinal) return MESSAGES.thanks;
@@ -229,66 +197,77 @@ class Game {
 
     // --- Interpretação do texto digitado ---
 
-    // Retorna o comando mapeado mais parecido com o texto, se algum passar do score mínimo
-    async commandBrain(wordCommand) {
-        const allKeys = this.commandMapper.flatMap(element => element.keys);
-        const scores = await this.embedding.scores(wordCommand, allKeys);
+    async brain(phaseInput) {
+        const allKeys = [];
+        const options = this.context?.chapter?.options || [];
+
+        allKeys.push(...this.commandMapper.flatMap(element => element.keys));
+        allKeys.push(...options.map(option => option.content));
+
+        const scores = await this.embedding.scores(phaseInput, allKeys);
 
         // melhor score de cada comando (maior entre as suas frases)
         let offset = 0;
-        const commandScores = this.commandMapper.map(element => {
-            const keyScores = scores.slice(offset, offset + element.keys.length);
-            offset += element.keys.length;
+        const commandScores = [...this.commandMapper, ...options]
+            .map(element => {
+                const length = element.keys ? element.keys.length : 1;
+                const keyScores = scores.slice(offset, offset + length);
+                offset += length;
 
-            return { score: Math.max(...keyScores), element };
-        });
-
-        commandScores.sort((a, b) => b.score - a.score);
+                return {
+                    score: Math.max(...keyScores),
+                    element: {
+                        ...element,
+                        isInternalCommand: !!element?.func // flag para definir se é comando interno ou é narrativo
+                    },
+                    type: element.type || CONTEXT_STATE.Chapter
+                };
+            })
+            .sort((a, b) => b.score - a.score);
 
         console.log("============ score commandos =============");
-        console.log(commandScores.map(c => ({ name: c.element.name, score: c.score })));
+        console.log(commandScores);
 
-        const [best, second] = commandScores;
+        const [bestOutput] = commandScores;
 
-        if (!best || best.score <= COMMAND_MIN_SCORE) return;
+        console.log(`Escolhodo:`);
+        console.log(bestOutput);
 
-        // evita escolher quando dois comandos estão praticamente empatados
-        // if (second && best.score - second.score < COMMAND_MIN_MARGIN) return;
+        if (!bestOutput || bestOutput.score <= COMMAND_MIN_SCORE) return;
 
-        return best.element;
+
+        return bestOutput;
     }
 
-    // Retorna a opção do capítulo atual mais parecida com o texto
-    async chapterBrain(wordCommand) {
-        const options = this.context.chapter.options;
-        const match = await this.embedding.processing(wordCommand, options.map(option => option.content), 0.5);
-
-        if (!match) return;
-
-        return options[match.index];
-    }
-
-    async processor(wordCommand) {
-        if (Helper.isQuickHelp(wordCommand)) return this.helper.explain(this.context);
+    async processor(input) {
+        if (Helper.isQuickHelp(input)) return this.helper.explain(this.context);
 
         if (this.context.is(CONTEXT_STATE.EndGame)) return MESSAGES.thanks;
 
-        if (wordCommand.length < MIN_COMMAND_LENGTH) return MESSAGES.tooShort;
+        if (input.length < MIN_COMMAND_LENGTH) return MESSAGES.tooShort;
 
-        const command = await this.commandBrain(wordCommand);
-        const nextChapter = await this.chapterBrain(wordCommand);
+        const brain = await this.brain(input);
 
-        if (this.context.chapter.isBattle && command?.type === "combat") {
-            return this.battle.combat(wordCommand, this.context);
+        if (!brain || !this.context.chapter.isBattle && brain?.type === CONTEXT_STATE.Combat) {
+            this.context.currentState = CONTEXT_STATE.System;
+            return MESSAGES.notUnderstood;
         }
 
-        if (!command && !nextChapter) return MESSAGES.notUnderstood;
-
-        if (nextChapter) return this.nextNarrative(nextChapter);
-        if (command) {
-            this.context.currentState = command.type;
-            return await command.func(wordCommand, this.context);
+        if (this.context.chapter.isBattle && brain?.type === CONTEXT_STATE.Combat) {
+            return this.battle.combat(input, this.context);
         }
+
+        if (brain.type === CONTEXT_STATE.Chapter) return this.nextNarrative(brain.element);
+
+        const isvalid = brain.element.validations.every(validation => validation(this.context));
+
+        if (!isvalid) {
+            this.context.currentState = CONTEXT_STATE.Consult;
+            return `Você não pode fazer isso agora.`;
+        }
+
+        this.context.currentState = brain.type;
+        return await brain.element.func(input, this.context);
     }
 }
 
